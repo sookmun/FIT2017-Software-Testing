@@ -1,3 +1,10 @@
+import requests
+from decimal import Decimal
+import self as self
+from flask import Flask, flash
+from flask import render_template
+from flask import request
+
 class Calculator():
     # you can choose to initialise variables here, if needed.
     def __init__(self):
@@ -14,6 +21,9 @@ class Calculator():
             surcharge_factor = 1.1
         else:
             surcharge_factor = 1
+        # initial_state = Decimal(initial_state)
+        # final_state = Decimal(final_state)
+        # capacity = Decimal(capacity)
 
         cost = (final_state - initial_state) / 100 * capacity * base_price / 100 * surcharge_factor
         return cost
@@ -60,4 +70,25 @@ class Calculator():
     def calculate_solar_energy(self):
         pass
 
+
+    def getApi(self):
+        url = 'http://118.138.246.158/api/v1/location?'
+        postcode1 = request.form['PostCode']
+        params = {"postcode": postcode1}
+        res = requests.get(url, params=params)
+        # return res
+        # res = requests.get("http://118.138.246.158/api/v1/location?postcode=3800")
+        data = res.json()
+        postcode2 = data[0]["postcode"]
+        if postcode2 == postcode1:
+            return "True"
+        else:
+            return "False"
+
+
+
+# if __name__ == "__main__":
+#     data = "3800"
+#     res = Calculator.getApi(self, data)
+#     print(res)
 
