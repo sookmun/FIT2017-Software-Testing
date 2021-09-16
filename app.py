@@ -44,14 +44,12 @@ def operation_result():
 
         # time = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)
 
-        # data = calculator.getApi()
-
         # you may change the return statement also
         
         # values of variables can be sent to the template for rendering the webpage that users will see
         # return render_template('calculator.html', cost = cost, time = time, calculation_success = True, form = calculator_form)
         return render_template('calculator.html', calculation_success=True, form=calculator_form)
-        # return render_template('calculator.html', calculation_success=True, form=calculator_form)
+        # return render_template('calculator.html', calculation_success=True, form=calculator_form, data = data)
 
     else:
         # battery_capacity = request.form['BatteryPackCapacity']
