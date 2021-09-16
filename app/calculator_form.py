@@ -1,6 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, TimeField
 from wtforms.validators import DataRequired, ValidationError, Optional
+from datetime import date
+import requests
+
 
 # validation for form inputs
 class Calculator_Form(FlaskForm):
@@ -21,21 +24,49 @@ class Calculator_Form(FlaskForm):
             raise ValidationError('Field data is none')
         elif field.data == '':
             raise ValueError("cannot fetch data")
+        try :
+            field.data =int(field.data)
+            if field.data <=0:
+                raise ValueError("Capacity must be more than 0")
+        except:
+            raise ValueError("Capacity must be a positive integer")
+
 
     # validate initial charge here
     def validate_InitialCharge(self, field):
         # another example of how to compare initial charge with final charge
         # you may modify this part of the code
-        if field.data > self.FinalCharge.data:
+        try :
+            field.data =int(field.data)
+        except:
+            raise ValueError("Final Charge must be a positive integer")
+
+        if field.data > int(self.FinalCharge.data):
             raise ValueError("Initial charge data error")
+        elif field.data <= 0:
+            raise ValueError("Initial charge must be more than 0")
+        elif field.data >= 100:
+            raise  ValueError("Initial charge must be less than 100")
 
     # validate final charge here
     def validate_FinalCharge(self, field):
-        pass
+        try:
+            field.data = int(field.data)
+        except:
+            raise ValueError("Final Charge must be a positive integer")
+
+        if field.data < int(self.InitialCharge.data):
+            raise ValueError("Final Charge data error")
+        elif field.data <= 0:
+            raise ValueError("Final Charge must be more than 0")
+        elif field.data >= 100:
+            raise ValueError("Final Charge must be less than 100")
 
     # validate start date here
     def validate_StartDate(self, field):
-        pass
+        today = date.today()
+        if field.data>today:
+            raise ValueError("Start date should not be future dates")
 
     # validate start time here
     def validate_StartTime(self, field):
@@ -43,8 +74,18 @@ class Calculator_Form(FlaskForm):
 
     # validate charger configuration here
     def validate_ChargerConfiguration(self, field):
-        pass
+        try:
+            field.data = int(field.data)
+        except:
+            raise ValueError("Charger Configuration must be an integer")
+        if field.data <= 0 or field.data > 8:
+            raise ValueError("Incorect Configuration. Choose a value between 1-8")
 
     # validate postcode here
     def validate_PostCode(self, field):
-        pass
+        url = " http://118.138.246.158/api/v1/location?postcode=" + field.data
+        response = requests.get(url)
+        if response.status_code != 200:
+            raise ValueError("This is not a valid postcode")
+
+
