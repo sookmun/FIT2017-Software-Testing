@@ -5,23 +5,25 @@ from flask import render_template
 from flask import request
 from datetime import datetime, timedelta
 from self import self
+import holidays
+import datetime
 
 
-class Calculator:
+class Calculator():
     # you can choose to initialise variables here, if needed.
-    left = 1
-
     def __init__(self):
-        pass
+        self.peak_start = datetime.time(6, 0, 0)
+        self.peak_end = datetime.time(18, 0, 0)
+
 
     # you may add more parameters if needed, you may modify the formula also.
-    def cost_calculation(self, initial_state, final_state, capacity, is_peak, is_holiday):
-        if is_peak:
+    def cost_calculation(self, initial_state, final_state, capacity, is_peak, is_holiday,start_date,start_time):
+        if is_peak(start_time):
             base_price = 100
         else:
             base_price = 50
 
-        if is_holiday:
+        if is_holiday(start_date):
             surcharge_factor = 1.1
         else:
             surcharge_factor = 1
@@ -34,14 +36,21 @@ class Calculator:
         time = (final_state - initial_state) / 100 * capacity / power
         return time
 
+
     # you may create some new methods at your convenience, or modify these methods, or choose not to use them.
     def is_holiday(self, start_date):
-        pass
+        aus_holidays = holidays.AUS()
+        if start_date in aus_holidays:
+            return True
+        return False
 
-    def is_peak(self):
-        pass
+    def is_peak(self, start_time):
+        current = start_time.split(':')
+        current = datetime.datetime(int(current[0]), int(current[1]), 0)
+        return self.peak_start <= current <= self.peak_end
 
-    def peak_period(self, start_time):
+
+    def peak_period(self, start_time,time):
         pass
 
     # def get_duration(self, start_time, charging_duration):
