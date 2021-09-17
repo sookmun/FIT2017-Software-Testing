@@ -1,14 +1,16 @@
 import requests
 from decimal import Decimal
-import self as self
 from flask import Flask, flash
 from flask import render_template
 from flask import request
-from datetime import datetime
+from datetime import datetime, timedelta
+from self import self
 
 
 class Calculator:
     # you can choose to initialise variables here, if needed.
+    left = 1
+
     def __init__(self):
         pass
 
@@ -23,9 +25,6 @@ class Calculator:
             surcharge_factor = 1.1
         else:
             surcharge_factor = 1
-        # initial_state = Decimal(initial_state)
-        # final_state = Decimal(final_state)
-        # capacity = Decimal(capacity)
 
         cost = (final_state - initial_state) / 100 * capacity * base_price / 100 * surcharge_factor
         return cost
@@ -45,29 +44,90 @@ class Calculator:
     def peak_period(self, start_time):
         pass
 
-    def get_duration(self, start_time):
-        pass
+    # def get_duration(self, start_time, charging_duration):
+    def find_endtime(self):
+        start_str = "10:00"
+        charging_duration = "30"
+
+        # convert the charging session
+        hours = int(charging_duration) // 60
+
+        # Get additional minutes with modulus
+        minutes = int(charging_duration) % 60
+
+        # Create time as a string
+        start_time = datetime.strptime(start_str, '%H:%M')
+        charging_session_str = "{}:{}".format(hours, minutes)
+        charging_session_final = datetime.strptime(charging_session_str, '%H:%M')
+        time_zero = datetime.strptime('00:00', '%H:%M')
+        end_time = start_time - time_zero + charging_session_final
+        print(end_time)
+        hr1 = start_time.hour
+        hr2 = end_time.hour
+        Calculator.left = Calculator.left + hr2 - hr1
+        return Calculator.left
 
     # to be acquired through API
     def get_sun_hour(self, sun_hour):
-        # si solar insolation (sun hour)
         pass
 
     # to be acquired through API
-    def get_solar_energy_duration(self, start_time):
-        pass
+    # def get_solar_energy_duration(self, start_time):
+    def get_solar_energy_duration(self):
+        # assume charging session from 5am -  8am
+        # start time 5am til 8am
+        start_time = "16:00"
+        charging_session = "180"
+        data = Calculator.get_weather(self)
+        # sunset = data["sunset"]
+        # sunrise = data["sunrise"]
+        sunrise = "7:30"
+        sunset = "18:00"
+        sunset_time = datetime.strptime(sunset, '%H:%M')
+        sunrise_time = datetime.strptime(sunrise, '%H:%M')
+        start_time = datetime.strptime(start_time, '%H:%M')
+
+        # convert the charging session
+        hours = int(charging_session) // 60
+
+        # Get additional minutes with modulus
+        minutes = int(charging_session) % 60
+
+        # Create time as a string
+        charging_session_str = "{}:{}".format(hours, minutes)
+        charging_session_final = datetime.strptime(charging_session_str, '%H:%M')
+        time_zero = datetime.strptime('00:00', '%H:%M')
+        end_time = start_time - time_zero + charging_session_final
+        duration = 0
+
+        if start_time > sunset_time or end_time < sunrise_time:
+            duration = 0
+        # whole session in daylight
+        elif sunrise_time < start_time < sunset_time and sunrise_time < end_time < sunset_time:
+            duration = (charging_session_final.hour * 60) + charging_session_final.minute
+        #  start_time before sunrise but end_time before sunset
+        elif start_time < sunrise_time and end_time < sunset_time:
+            cal = end_time - timedelta(hours=sunrise_time.hour, minutes=sunrise_time.minute, seconds=sunrise_time.second)
+            duration = (cal.hour * 60) + cal.minute
+        # start_time after sunrise but end_time after sunset
+        elif start_time > sunrise_time and end_time > sunset_time:
+            cal = sunset_time - timedelta(hours=start_time.hour, minutes=start_time.minute, seconds=start_time.second)
+            duration = (cal.hour * 60) + cal.minute
+
+        return str(duration)
 
     # to be acquired through API
     # def get_day_light_length(self, start_time):
     def get_day_light_length(self):
 
-        data = Calculator.get_weather(self)
+        # data = Calculator.get_weather(self)
+        # sunset = data["sunset"]
+        # sunrise = data["sunrise"]
+        sunrise = "05:44"
+        sunset = "19:05"
 
-        sunset = data["sunset"]
-        sunrise = data["sunrise"]
-
-        sunset_time = datetime.strptime(sunset,  '%H:%M:%S')
-        sunrise_time = datetime.strptime(sunrise, '%H:%M:%S')
+        sunset_time = datetime.strptime(sunset, '%H:%M')
+        sunrise_time = datetime.strptime(sunrise, '%H:%M')
         # dl = sunset - sunrise
         daylight_len = sunset_time - sunrise_time
         str_day_len = str(daylight_len)
@@ -78,40 +138,54 @@ class Calculator:
 
     # to be acquired through API
     def get_solar_insolation(self):
-        # url = "http://118.138.246.158/api/v1/weather?location={location}&date={date}".format(location=location, date=date)
-        # temp = requests.get(url)
-        temp = requests.get("http://118.138.246.158/api/v1/weather?location=ab9f494f-f8a0-4c24-bd2e-2497b99f2258&date=2021-08-01")
-        data = temp.json()
-        # print(data)
+        """ same sun hour on the same day"""
+        data = Calculator.get_weather(self)
         solar_insolation = data["sunHours"]
         return solar_insolation
 
     # to be acquired through API
-    def get_cloud_cover(self):
+    # def get_cloud_cover(self):
+    def get_cloud_cover(self, start_time):
+        """ need to retrieve hourly cloud value"""
         # need start time
         # input 10:00
         # start_time = "10:00"
-        start_time = request.form['StartTime']
+        # start_time = request.form['StartTime']
         time = start_time.split(":")
         data = Calculator.get_weather(self)
         cloud_cover = data["hourlyWeatherHistory"][int(time[0])]["cloudCoverPct"]
-        print(cloud_cover)
+        return cloud_cover
 
     def calculate_solar_energy(self):
-        # si*du/dl*50*0.20 for the amount of days
-        pass
+        # hourly solar energy
+        # AG1: si*du/dl*50*0.20 for the amount of days
+        # ALG2 :si*1/dl*(1-cc/100)*50*0.20
+
+        si = Calculator.get_solar_insolation(self)
+        dl = Calculator.get_day_light_length(self)
+        total = 0
+
+        for i in range(Calculator.left):
+            start_time = "10:00"
+            temp = start_time.split(":")
+            hr_num = int(temp[0]) + i
+            cc = Calculator.get_cloud_cover(self, str(hr_num))
+            cal = (si*1) / dl * (1 - cc / 100) * 50 * 0.20
+            total += cal
+        return total
+
+
 
     def get_weather(self):
+        """get information from weather api  through the postcode """
         # url = 'http://118.138.246.158/api/v1/location?'
         # postcode1 = request.form['PostCode']
         # params = {"postcode": postcode1}
         # res = requests.get(url, params=params)
         # return res
-        res = requests.get("http://118.138.246.158/api/v1/location?postcode=3800")
-        data = res.json()
+        temp = requests.get("http://118.138.246.158/api/v1/location?postcode=3800")
+        data = temp.json()
         a = data[0]["id"]
-        # print(data)
-        # print(a)
 
         # Calculator.check_date(self)
         b = "2021-09-12"
@@ -122,6 +196,7 @@ class Calculator:
         return data
 
     def check_date(self):
+        """ check for reference date"""
         # date = request.form['StartDate']
         # input: DD/MM/YYYY
         date = "2021-09-12"
@@ -161,19 +236,10 @@ class Calculator:
         return final_date
 
 
-
-
-
 if __name__ == "__main__":
     time = "10:00"
-    res = Calculator()
-    get = Calculator.get_day_light_length(self)
+    get = Calculator.calculate_solar_energy(self)
     print(get)
-    # data = "3800"
-    # res = Calculator.getApi(self)
-    # print(res)
-    # date = "20/9/2010"
-    # res = Calculator.check_date(self, date)
-    # print(res)
+
 
 

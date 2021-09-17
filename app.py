@@ -56,7 +56,8 @@ def operation_result():
         # flash(battery_capacity)
         # flash("something went wrong")
         flash_errors(calculator_form)
-        return render_template('calculator.html', calculation_success = False, form = calculator_form)
+        return render_template('calculator.html', calculation_success=False, form=calculator_form)
+
 
 # method to display all errors
 def flash_errors(form):
