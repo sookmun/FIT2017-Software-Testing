@@ -10,58 +10,86 @@ import holidays
 
 class Calculator():
     # you can choose to initialise variables here, if needed.
-    left = 1
-    # ref_date = request.form['StartDate']
+    period = 1
+    power = 0
+    price = 0
 
     def __init__(self):
-        # self.peak_start = datetime.time(6, 0, 0)
-        # self.peak_end = datetime.time(18, 0, 0)
         pass
 
 
     # you may add more parameters if needed, you may modify the formula also.
-    def cost_calculation(self, initial_state, final_state, capacity, is_peak, is_holiday,start_date,start_time):
-        if is_peak(start_time):
-            base_price = 100
-        else:
-            base_price = 50
+    def cost_calculation(self, alg, initial_state, final_state, capacity, start_date, start_time, charging_duration, postcode, charger_config):
+        Calculator.charger_configuration(self, charger_config)
+        if Calculator.is_peak(self, start_time):
+            Calculator.price = Calculator.price * 2
 
-        if is_holiday(start_date):
+        if Calculator.is_holiday(self, start_date):
             surcharge_factor = 1.1
         else:
             surcharge_factor = 1
 
-        cost = (final_state - initial_state) / 100 * capacity * base_price / 100 * surcharge_factor
-        return str(cost)
+        charging_cost = Calculator.calculate_charging_cost(self, alg, start_date, start_time, charging_duration, postcode)
+        cost = (float(final_state) - float(initial_state)) / 100 * float(capacity) * float(charging_cost) / 100 * surcharge_factor
+        return "{:.2f}".format(cost)
 
     # you may add more parameters if needed, you may also modify the formula.
     def time_calculation(self, initial_state, final_state, capacity, power):
-        time = ((int(final_state) - int(initial_state)) / 100 * int(capacity) / power) * 60
+        time = ((float(final_state) - float(initial_state)) / 100 * int(capacity) / float(power)) * 60
         time_str = "{:.2f}".format(time)
         return time_str
 
-
     # you may create some new methods at your convenience, or modify these methods, or choose not to use them.
     def is_holiday(self, start_date):
+        date = Calculator.format_date(self, start_date)
+        ref_date = Calculator.check_date(self, date)
         aus_holidays = holidays.AUS()
-        if start_date in aus_holidays:
+        if ref_date in aus_holidays:
             return True
         return False
 
-    # def is_peak(self, start_time):
-    #     current = start_time.split(':')
-    #     current = datetime.datetime(int(current[0]), int(current[1]), 0)
-    #     return self.peak_start <= current <= self.peak_end
+    def is_peak(self, start_time):
+        peak_start = "06:00"
+        peak_end = "18:00"
+        peak_start_time = datetime.strptime(peak_start, '%H:%M')
+        peak_end_time = datetime.strptime(peak_end, '%H:%M')
+        current = datetime.strptime(start_time, "%H:%M")
 
+        return peak_start_time <= current <= peak_end_time
+
+    def charger_configuration(self, num_str):
+        num = int(num_str)
+        if num == 1:
+            Calculator.power = 2
+            Calculator.price = 5
+        elif num == 2:
+            Calculator.power = 3.6
+            Calculator.price = 7.5
+        elif num == 3:
+            Calculator.power = 7.2
+            Calculator.price = 10
+        elif num == 4:
+            Calculator.power = 11
+            Calculator.price = 12.5
+        elif num == 5:
+            Calculator.power = 22
+            Calculator.price = 15
+        elif num == 6:
+            Calculator.power = 36
+            Calculator.price = 20
+        elif num == 7:
+            Calculator.power = 90
+            Calculator.price = 30
+        else:
+            Calculator.power = 350
+            Calculator.price = 50
+
+        return Calculator.power
 
     def peak_period(self, start_time,time):
         pass
 
     def get_duration(self, start_time, charging_duration):
-    # def find_endtime(self):
-    #     start_str = "10:00"
-    #     charging_duration = "30"
-
         # convert the charging session
         hours = int(float(charging_duration)) // 60
 
@@ -76,29 +104,26 @@ class Calculator():
         end_time = start_time - time_zero + charging_session_final
         hr1 = start_time.hour
         hr2 = end_time.hour
-        Calculator.left = Calculator.left + hr2 - hr1
+        Calculator.period = Calculator.period + hr2 - hr1
 
     # to be acquired through API
-    def get_solar_energy_duration(self, start_time, charging_session):
-    # def get_solar_energy_duration(self):
-        # assume charging session from 5am -  8am
-        # start time 5am til 8am
-        # start_time = "16:00"
-        # charging_session = "180"
-        # data = Calculator.get_weather(self)
-        # sunset = data["sunset"]
-        # sunrise = data["sunrise"]
-        sunrise = "7:30"
-        sunset = "18:00"
-        sunset_time = datetime.strptime(sunset, '%H:%M')
-        sunrise_time = datetime.strptime(sunrise, '%H:%M')
+    def get_solar_energy_duration(self, data, start_time, charging_session):
+    # def get_solar_energy_duration(self, start_time, charging_session):
+
+        sunset = data["sunset"]
+        sunrise = data["sunrise"]
+        # sunrise = "06:00:00"
+        # sunset = "18:00:00"
+
+        sunset_time = datetime.strptime(sunset, '%H:%M:%S')
+        sunrise_time = datetime.strptime(sunrise, '%H:%M:%S')
         start_time = datetime.strptime(start_time, '%H:%M')
 
         # convert the charging session
-        hours = int(charging_session) // 60
+        hours = int(float(charging_session)) // 60
 
         # Get additional minutes with modulus
-        minutes = int(charging_session) % 60
+        minutes = int(float(charging_session)) % 60
 
         # Create time as a string
         charging_session_str = "{}:{}".format(hours, minutes)
@@ -127,15 +152,11 @@ class Calculator():
     # def get_day_light_length(self, start_time):
     def get_day_light_length(self, data):
 
-        # data = Calculator.get_weather(self, date)
         sunset = data["sunset"]
         sunrise = data["sunrise"]
-        # sunrise = "05:44"
-        # sunset = "19:05"
 
         sunset_time = datetime.strptime(sunset, '%H:%M:%S')
         sunrise_time = datetime.strptime(sunrise, '%H:%M:%S')
-        # dl = sunset - sunrise
         daylight_len = sunset_time - sunrise_time
         str_day_len = str(daylight_len)
         temp = str_day_len.split(":")
@@ -151,21 +172,18 @@ class Calculator():
         return solar_insolation
 
     # to be acquired through API
-    # def get_cloud_cover(self):
     def get_cloud_cover(self, data, start_time):
         """ need to retrieve hourly cloud value"""
         cloud_cover = data["hourlyWeatherHistory"][int(start_time)]["cloudCoverPct"]
         return cloud_cover
 
     def calculate_solar_energy_alg2(self, data, start_time, charging_duration):
-        # hourly solar energy
-        # ALG2 :si*1/dl*(1-cc/100)*50*0.20
         si = Calculator.get_solar_insolation(self, data)
         dl = Calculator.get_day_light_length(self, data)
         total = 0
         Calculator.get_duration(self, start_time, charging_duration)
 
-        for i in range(Calculator.left):
+        for i in range(Calculator.period):
             temp = start_time.split(":")
             hr_num = int(temp[0]) + i
             cc = Calculator.get_cloud_cover(self, data, str(hr_num))
@@ -175,24 +193,18 @@ class Calculator():
         return total
 
     def calculate_solar_energy_alg1(self, date, start_time, charging_duration, postcode):
-        # AG1: si*du/dl*50*0.20 for the amount of days
         date = Calculator.format_date(self, date)
         data = Calculator.get_weather(self, date, postcode)
         si = Calculator.get_solar_insolation(self, data)
         dl = Calculator.get_day_light_length(self, data)
-        du = Calculator.get_solar_energy_duration(self, start_time, charging_duration)
-        print(si)
-        print(dl)
-        print(du)
+        du = Calculator.get_solar_energy_duration(self, data, start_time, charging_duration)
         res = si * du / dl * 50 * 0.20
-        return res
+        ans = "{:.2f}".format(res)
+        return ans
 
     def cum_calculate_solar_energy(self, date, start_time, charging_duration, postcode):
         total = 0
-        # # ref_date = request.form['StartDate']
-        # ref_date = "12/09/2021"
         date = Calculator.format_date(self, date)
-        # 2021-9-21, 2020-9-21, 2019-9-21
 
         for i in range(3):
             temp = date.split("-")
@@ -207,6 +219,27 @@ class Calculator():
         average_str = "{:.2f}".format(average)
         return average_str
 
+    def calculate_charging_cost(self, alg, date, start_time, charging_duration, postcode):
+        charging_cost = 0
+        energy = 0
+
+        if alg == 1:
+            energy = Calculator.calculate_solar_energy_alg1(self, date, start_time, charging_duration, postcode)
+        elif alg == 2:
+            energy = Calculator.cum_calculate_solar_energy(self, date, start_time, charging_duration, postcode)
+
+        # Calculator.charger_configuration(self, charger_config)
+        solar_energy = float(energy)
+
+        if solar_energy >= Calculator.power:
+            charging_cost = 0
+        else:
+            charging_cost = (Calculator.power - solar_energy) * Calculator.price
+
+        final_charging_cost = "{:.2f}".format(charging_cost)
+        return final_charging_cost
+
+
     def get_weather(self, date, postcode):
         """get information from weather api  through the postcode """
         url = 'http://118.138.246.158/api/v1/location?postcode={postcode}'.format(postcode=postcode)
@@ -214,7 +247,6 @@ class Calculator():
         data = temp.json()
         location = data[0]["id"]
         ref_date = Calculator.check_date(self, date)
-        # Calculator.ref_date = date
         weather_url = 'http://118.138.246.158/api/v1/weather?location={ID}&date={date}'.format(ID=location, date=ref_date)
 
         weather = requests.get(weather_url)
@@ -223,13 +255,11 @@ class Calculator():
 
     def check_date(self, date):
         """ check for reference date"""
-        # input: YYYY-MM-DD
         current_date = datetime.today().strftime('%Y-%m-%d')
         current = current_date.split("-")
         current_year = int(current[2])
         input = date.split("-")
         input_year = int(input[2])
-        # check for future year
         if input_year > current_year:
             input.pop(2)
             input.append(str(current_year))
@@ -264,16 +294,21 @@ class Calculator():
         final = "-".join(temp)
         return final
 
-#
+
 if __name__ == "__main__":
     dat = "12/9/2021"
-    time = "10:00"
-    new_date = Calculator.format_date(self, dat)
-    info = Calculator.get_weather(self, new_date, "3800")
-    get = Calculator.get_solar_insolation(self, info)
-    res = Calculator.cum_calculate_solar_energy(self, dat, time, "180", "3800")
-    res2 = Calculator.calculate_solar_energy_alg1(self, dat, time, 8, "3800")
-    print(res2)
+    time = "17:00"
+
+    # res = Calculator.get_solar_energy_duration(self,"10:00", "8.43")
+    # print(res)
+    # new_date = Calculator.format_date(self, dat)
+    # # info = Calculator.get_weather(self, new_date, "3800")
+    # # get = Calculator.get_solar_insolation(self, info)
+    # # res = Calculator.cum_calculate_solar_energy(self, dat, time, "180", "3800")
+    # # res2 = Calculator.calculate_solar_energy_alg1(self, dat, time, 8, "3800")
+    # # res = Calculator.charger_configuration(self, "2")
+    # res = Calculator.calculate_charging_cost(self, 2,  dat, time, "30", "3800", "7")
+    # print(res)
     # print(res)
 
 
