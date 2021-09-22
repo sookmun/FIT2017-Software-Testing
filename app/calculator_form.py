@@ -25,7 +25,7 @@ class Calculator_Form(FlaskForm):
             raise ValidationError('Field data is none')
         elif field.data == '':
             raise ValueError("cannot fetch data")
-        try :
+        try:
             field.data =int(field.data)
             if field.data <=0:
                 raise ValueError("Capacity must be more than 0")
@@ -66,6 +66,7 @@ class Calculator_Form(FlaskForm):
     # validate start date here
     def validate_StartDate(self, field):
         today = date.today()
+        #nned to change here
         if field.data>today:
             raise ValueError("Start date should not be future dates")
 
