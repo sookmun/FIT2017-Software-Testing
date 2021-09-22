@@ -1,8 +1,8 @@
 from flask import Flask, flash
 from flask import render_template
 from flask import request
-from app.calculator import *
 from app.calculator_form import *
+from app.calculator import *
 import os
 SECRET_KEY = os.urandom(32)
 
@@ -42,11 +42,9 @@ def operation_result():
 
         charging_duration = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)
 
-        cost_alg1 = calculator.cost_calculation(1, initial_charge, final_charge, battery_capacity, start_date, start_time, charging_duration, postcode, charger_configuration)
-
-        cost_alg2 = calculator.cost_calculation(2, initial_charge, final_charge, battery_capacity, start_date,
-                                                start_time, charging_duration, postcode, charger_configuration)
-
+        cost1 = calculator.cost_calculation_alg1_asg1(start_date, start_time, initial_charge, final_charge, battery_capacity, charger_configuration)
+        cost2 = calculator.cost_calculation_alg1_asg2(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge)
+        cost3 = calculator.cost_calculation_alg2_asg2(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge)
         # cost = calculator.cost_calculation(initial_charge, final_charge, battery_capacity, is_peak, is_holiday)
 
         # time = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)
@@ -56,7 +54,7 @@ def operation_result():
         # values of variables can be sent to the template for rendering the webpage that users will see
         # return render_template('calculator.html', cost = cost, time = time, calculation_success = True, form = calculator_form)
         # return render_template('calculator.html', calculation_success=True, form=calculator_form)
-        return render_template('calculator.html', calculation_success=True, form=calculator_form, charging_time=charging_duration, cost_alg1=cost_alg1, cost_alg2=cost_alg2)
+        return render_template('calculator.html', calculation_success=True, form=calculator_form, charging_time=charging_duration, cost1=cost1, cost2=cost2, cost3=cost3)
 
     else:
         # battery_capacity = request.form['BatteryPackCapacity']
