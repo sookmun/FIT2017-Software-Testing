@@ -1,5 +1,6 @@
 from app.calculator import Calculator
 import unittest
+from datetime import datetime
 
 
 class TestCalculator(unittest.TestCase):
@@ -24,6 +25,8 @@ class TestCalculator(unittest.TestCase):
     def test_peak(self):
         time = "17:30"
         other_time = "05:00"
+        time = datetime.strptime(time, "%H:%M")
+        other_time = datetime.strptime(other_time, "%H:%M")
         self.calculator = Calculator()
         self.assertTrue(self.calculator.is_peak(time), "Time given is not within peak hours")
 
@@ -47,8 +50,6 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(90, self.calculator.charger_configuration(7), "Wrong power")
 
         self.assertEqual(350, self.calculator.charger_configuration(8), "Wrong power")
-
-
 
 
     # you may create test suite if needed
