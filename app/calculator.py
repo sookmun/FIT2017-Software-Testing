@@ -5,6 +5,7 @@ from flask import render_template
 from flask import request
 from datetime import datetime, timedelta
 import holidays
+from self import self
 
 
 class Calculator():
@@ -43,10 +44,8 @@ class Calculator():
         ref_date = Calculator.check_date(self, formatted_date)
         Calculator.charger_configuration(self, charger_configuration)
         energy = Calculator.calculate_solar_energy_alg1(self, ref_date, postcode, start_time, charging_duration)
-        print(energy)
         solar_energy = energy[0]
         du = energy[1]
-        print(du)
         price = Calculator.get_price(self)
         for i in range(len(solar_energy)):
             solar = solar_energy[i]
@@ -149,10 +148,10 @@ class Calculator():
     def is_peak(self, start_time):
         peak_start = "06:00"
         peak_end = "18:00"
-        given_time = datetime.strptime(start_time, '%H:%M')
+        # given_time = datetime.strptime(start_time, '%H:%M')
         peak_start_time = datetime.strptime(peak_start, '%H:%M')
         peak_end_time = datetime.strptime(peak_end, '%H:%M')
-        return peak_start_time <= given_time < peak_end_time
+        return peak_start_time <= start_time < peak_end_time
 
 
     def charger_configuration(self, charger_config):
@@ -429,7 +428,7 @@ class Calculator():
     # time = "14:00"
     # charging_duration = "45"
     # charger_config = "3"
-    # res = Calculator.cum_calculate_solar_energy_alg2(self, date, postcode, time, charging_duration)
-    # res = Calculator.cost_calculation_alg2_asg2(self, date, postcode, time, charging_duration, charger_config, initial_state, final_state)
+    # # res = Calculator.cum_calculate_solar_energy_alg2(self, date, postcode, time, charging_duration)
+    # res = Calculator.cost_calculation_alg1_asg2(self, date, postcode, time, charging_duration, charger_config, initial_state, final_state)
     # print(res)
 
