@@ -44,10 +44,12 @@ class Calculator():
         ref_date = Calculator.check_date(self, formatted_date)
         Calculator.charger_configuration(self, charger_configuration)
         energy = Calculator.calculate_solar_energy_alg1(self, ref_date, postcode, start_time, charging_duration)
+        print(energy)
         solar_energy = energy[0]
         du = energy[1]
+        print(du)
         price = Calculator.get_price(self)
-        for i in range(len(energy)):
+        for i in range(len(solar_energy)):
             solar = solar_energy[i]
             energy_drawn = Calculator.power * du[i]
             net_energy = energy_drawn - float(solar)
@@ -75,10 +77,17 @@ class Calculator():
         for i in range(len(energy)):
             info = energy[i]
             for j in range(len(info)):
-                solar = info[0]
-                du = info[1]
-                solar_energy = solar[j]
-                energy_drawn = Calculator.power * du[j]
+                if len(info[0]) > 1:
+                    solar = info[0]
+                    du = info[1]
+                    solar_energy = solar[j]
+                    energy_drawn = Calculator.power * du[j]
+                else:
+                    solar = info[0]
+                    du = info[1]
+                    solar_energy = solar[0]
+                    energy_drawn = Calculator.power * du[0]
+
                 net_energy = energy_drawn - float(solar_energy)
                 soc = (int(final_state) - int(initial_state)) / 100
                 if Calculator.is_holiday(self, ref_date):
@@ -89,8 +98,10 @@ class Calculator():
                 if net_energy <= 0:
                     total_cost += 0
                 else:
-                    total_cost += soc * net_energy * surcharge * price[j]
-
+                    if len(info[0]) > 1:
+                        total_cost += soc * net_energy * surcharge * price[j]
+                    else:
+                        total_cost += soc * net_energy * surcharge * price[0]
         return "{:.2f}".format(total_cost)
 
     def get_price(self):
@@ -388,24 +399,35 @@ class Calculator():
         final_date = "-".join(temp)
         return final_date
 
-if __name__ == "__main__":
-    # date = "25/12/2020"
+
+# if __name__ == "__main__":
+#     date = "25/12/2020"
     # postcode = "6001"
     # time = "08:00"
     # charging_duration = "60"
     #
     # res = Calculator.calculate_solar_energy_alg1(self, date, postcode, time, charging_duration)
     # print(res)
-    initial_state = "10"
-    final_state = "20"
-    capacity = "100"
-    power = "50"
-    date = "22/02/2022"
-    postcode = "7250"
-    time = "17:30"
-    charging_duration = "45"
-    charger_config = "3"
+    # initial_state = "5"
+    # final_state = "70"
+    # capacity = "80"
+    # power = "50"
+    # date = "22/02/2022"
+    # postcode = "7250"
+    # time = "17:30"
+    # charging_duration = "45"
+    # charger_config = "3"
+
+    # initial_state = "5"
+    # final_state = "70"
+    # capacity = "80"
+    # power = "50"
+    # date = "18/09/2021"
+    # postcode = "6800"
+    # time = "14:00"
+    # charging_duration = "45"
+    # charger_config = "3"
     # res = Calculator.cum_calculate_solar_energy_alg2(self, date, postcode, time, charging_duration)
-    res = Calculator.cost_calculation_alg1_asg2(self, date, postcode, time, charging_duration, charger_config, initial_state, final_state)
-    print(res)
+    # res = Calculator.cost_calculation_alg2_asg2(self, date, postcode, time, charging_duration, charger_config, initial_state, final_state)
+    # print(res)
 

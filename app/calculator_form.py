@@ -37,7 +37,7 @@ class Calculator_Form(FlaskForm):
     def validate_InitialCharge(self, field):
         # another example of how to compare initial charge with final charge
         # you may modify this part of the code
-        try :
+        try:
             field.data =int(field.data)
         except:
             raise ValueError("Final Charge must be a positive integer")
