@@ -38,12 +38,12 @@ class Calculator():
         cost = (float(final_state) - float(initial_state)) / 100 * float(capacity) * float(price) / 100 * surcharge_factor
         return "{:.2f}".format(cost)
 
-    def cost_calculation_alg1_asg2(self, date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state):
+    def cost_calculation_alg1_asg2(self, date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location):
         total_cost = 0
         formatted_date = Calculator.format_date(self, date)
         ref_date = Calculator.check_date(self, formatted_date)
         Calculator.charger_configuration(self, charger_configuration)
-        energy = Calculator.calculate_solar_energy_alg1(self, ref_date, postcode, start_time, charging_duration)
+        energy = Calculator.calculate_solar_energy_alg1(self, ref_date, postcode, start_time, charging_duration, location)
         solar_energy = energy[0]
         du = energy[1]
         price = Calculator.get_price(self)
@@ -65,12 +65,12 @@ class Calculator():
         return "{:.2f}".format(total_cost)
 
     def cost_calculation_alg2_asg2(self, date, postcode, start_time, charging_duration, charger_configuration,
-                                   initial_state, final_state):
+                                   initial_state, final_state, location):
         total_cost = 0
         formatted_date = Calculator.format_date(self, date)
         ref_date = Calculator.check_date(self, formatted_date)
         Calculator.charger_configuration(self, charger_configuration)
-        energy = Calculator.cum_calculate_solar_energy_alg2(self, ref_date, postcode, start_time, charging_duration)
+        energy = Calculator.cum_calculate_solar_energy_alg2(self, ref_date, postcode, start_time, charging_duration, location)
         price = Calculator.get_price(self)
         for i in range(len(energy)):
             info = energy[i]
@@ -184,7 +184,6 @@ class Calculator():
         return Calculator.power
 
     def get_solar_energy_duration(self, data, start_time, charging_duration):
-        # data = Calculator.get_weather(self, date, postcode)
 
         sunset = data["sunset"]
         sunrise = data["sunrise"]
@@ -263,7 +262,6 @@ class Calculator():
     # to be acquired through API
     def get_solar_insolation(self, data):
         """ same sun hour on the same day"""
-        # data = Calculator.get_weather(self, date)
         solar_insolation = data["sunHours"]
         return solar_insolation
 
@@ -273,10 +271,10 @@ class Calculator():
         cloud_cover = data["hourlyWeatherHistory"][int(start_time)]["cloudCoverPct"]
         return cloud_cover
 
-    def calculate_solar_energy_alg1(self, date, postcode, start_time, charging_duration):
+    def calculate_solar_energy_alg1(self, date, postcode, start_time, charging_duration, location):
         total = 0
         final_total = []
-        data = Calculator.get_weather(self, date, postcode)
+        data = Calculator.get_weather(self, date, postcode, location)
         si = Calculator.get_solar_insolation(self, data)
         dl = Calculator.get_day_light_length(self, data)
         Calculator.get_solar_energy_duration(self, data, start_time, charging_duration)
@@ -311,12 +309,12 @@ class Calculator():
 
         return du
 
-    def calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration):
+    def calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location):
         total = 0
         final_total = []
         # formatted_date = Calculator.format_date(self, date)
         # ref_date = Calculator.check_date(self, formatted_date)
-        data = Calculator.get_weather(self, date, postcode)
+        data = Calculator.get_weather(self, date, postcode, location)
         si = Calculator.get_solar_insolation(self, data)
         dl = Calculator.get_day_light_length(self, data)
         Calculator.get_solar_energy_duration(self, data, start_time, charging_duration)
@@ -331,7 +329,7 @@ class Calculator():
 
         return final_total, du
 
-    def cum_calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration):
+    def cum_calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location):
         total = []
         date = Calculator.format_date(self, date)
 
@@ -342,17 +340,23 @@ class Calculator():
             temp.insert(0, str(year))
             temp.pop(1)
             ref_date2 = "-".join(temp)
-            energy = Calculator.calculate_solar_energy_alg2(self, ref_date2, postcode, start_time, charging_duration)
+            energy = Calculator.calculate_solar_energy_alg2(self, ref_date2, postcode, start_time, charging_duration, location)
             total.append(energy)
 
         return total
 
-    def get_weather(self, date, postcode):
+    def get_weather(self, date, postcode, location):
         """get information from weather api  through the postcode """
         url = 'http://118.138.246.158/api/v1/location?postcode={postcode}'.format(postcode=postcode)
         temp = requests.get(url)
         data = temp.json()
-        location = data[0]["id"]
+        location = location.upper()
+        for i in range(len(data)):
+            location_name = data[i]["name"]
+            if location_name == location:
+                location = data[i]["id"]
+                break
+
         ref_date = Calculator.check_date(self, date)
         weather_url = 'http://118.138.246.158/api/v1/weather?location={ID}&date={date}'.format(ID=location, date=ref_date)
 
@@ -402,33 +406,37 @@ class Calculator():
 
 
 # if __name__ == "__main__":
-#     date = "25/12/2020"
-    # postcode = "6001"
-    # time = "08:00"
-    # charging_duration = "60"
-    #
-    # res = Calculator.calculate_solar_energy_alg1(self, date, postcode, time, charging_duration)
-    # print(res)
-    # initial_state = "5"
-    # final_state = "70"
-    # capacity = "80"
-    # power = "50"
-    # date = "22/02/2022"
-    # postcode = "7250"
-    # time = "17:30"
-    # charging_duration = "45"
-    # charger_config = "3"
-
-    # initial_state = "5"
-    # final_state = "70"
-    # capacity = "80"
-    # power = "50"
-    # date = "18/09/2021"
-    # postcode = "6800"
-    # time = "14:00"
-    # charging_duration = "45"
-    # charger_config = "3"
-    # # res = Calculator.cum_calculate_solar_energy_alg2(self, date, postcode, time, charging_duration)
-    # res = Calculator.cost_calculation_alg1_asg2(self, date, postcode, time, charging_duration, charger_config, initial_state, final_state)
-    # print(res)
+# #     date = "25/12/2020"
+#     # postcode = "6001"
+#     # time = "08:00"
+#     # charging_duration = "60"
+#     #
+#     # res = Calculator.calculate_solar_energy_alg1(self, date, postcode, time, charging_duration)
+#     # print(res)
+#     # initial_state = "5"
+#     # final_state = "70"
+#     # capacity = "80"
+#     # power = "50"
+#     # date = "22/02/2022"
+#     # postcode = "7250"
+#     # time = "17:30"
+#     # charging_duration = "45"
+#     # charger_config = "3"
+#
+#     # initial_state = "5"
+#     # final_state = "70"
+#     # capacity = "80"
+#     # power = "50"
+#     date = "18/09/2021"
+#     postcode = "0872"
+#     location = "aherrenge"
+#     # time = "14:00"
+#     # charging_duration = "45"
+#     # charger_config = "3"
+#     # # res = Calculator.cum_calculate_solar_energy_alg2(self, date, postcode, time, charging_duration)
+#     # res = Calculator.cost_calculation_alg1_asg2(self, date, postcode, time, charging_duration, charger_config, initial_state, final_state)
+#     # print(res)
+#     # date = Calculator.format_date(self, date)
+#     # res = Calculator.get_weather(self, date, postcode, location)
+#     # print(res)
 

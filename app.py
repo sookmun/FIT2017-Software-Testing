@@ -1,9 +1,10 @@
-from flask import Flask, flash
-from flask import render_template
-from flask import request
+from flask import Flask, flash, render_template, request, jsonify
+from flask_wtf import FlaskForm
+
 from app.calculator_form import *
 from app.calculator import *
 import os
+
 SECRET_KEY = os.urandom(32)
 
 ev_calculator_app = Flask(__name__)
@@ -30,6 +31,7 @@ def operation_result():
         start_time = request.form['StartTime']
         charger_configuration = request.form['ChargerConfiguration']
         postcode = request.form['PostCode']
+        location = request.form['Location']
 
         # you may change the logic as your like
         # duration = calculator.get_duration(start_time)
@@ -43,8 +45,8 @@ def operation_result():
         charging_duration = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)
 
         cost1 = calculator.cost_calculation_alg1_asg1(start_date, start_time, initial_charge, final_charge, battery_capacity, charger_configuration)
-        cost2 = calculator.cost_calculation_alg1_asg2(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge)
-        cost3 = calculator.cost_calculation_alg2_asg2(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge)
+        cost2 = calculator.cost_calculation_alg1_asg2(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
+        cost3 = calculator.cost_calculation_alg2_asg2(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
         # cost = calculator.cost_calculation(initial_charge, final_charge, battery_capacity, is_peak, is_holiday)
 
         # time = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)
@@ -52,7 +54,6 @@ def operation_result():
         # you may change the return statement also
         
         # values of variables can be sent to the template for rendering the webpage that users will see
-        # return render_template('calculator.html', cost = cost, time = time, calculation_success = True, form = calculator_form)
         # return render_template('calculator.html', calculation_success=True, form=calculator_form)
         return render_template('calculator.html', calculation_success=True, form=calculator_form, charging_time=charging_duration, cost1=cost1, cost2=cost2, cost3=cost3)
 
