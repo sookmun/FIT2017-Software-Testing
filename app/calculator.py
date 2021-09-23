@@ -135,12 +135,15 @@ class Calculator():
             return True
         return False
 
+
     def is_peak(self, start_time):
         peak_start = "06:00"
         peak_end = "18:00"
+        given_time = datetime.strptime(start_time, '%H:%M')
         peak_start_time = datetime.strptime(peak_start, '%H:%M')
         peak_end_time = datetime.strptime(peak_end, '%H:%M')
-        return peak_start_time <= start_time < peak_end_time
+        return peak_start_time <= given_time < peak_end_time
+
 
     def charger_configuration(self, charger_config):
         config = int(charger_config)

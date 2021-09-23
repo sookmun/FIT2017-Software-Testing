@@ -32,7 +32,7 @@ class TestCalculator(unittest.TestCase):
 
     def test_charger_config(self):
         self.calculator = Calculator()
-        self.assertEqual(2, self.calculator.charger_configuration(1),"Wrong power")
+        self.assertEqual(2, self.calculator.charger_configuration(1.3),"Wrong power")
 
         self.assertEqual(3.6, self.calculator.charger_configuration(2), "Wrong power")
 
@@ -42,7 +42,7 @@ class TestCalculator(unittest.TestCase):
 
         self.assertEqual(22, self.calculator.charger_configuration(5), "Wrong power")
 
-        self.assertEqual(32, self.calculator.charger_configuration(6), "Wrong power")
+        self.assertEqual(36, self.calculator.charger_configuration(6), "Wrong power")
 
         self.assertEqual(90, self.calculator.charger_configuration(7), "Wrong power")
 
