@@ -4,7 +4,6 @@ from flask import Flask, flash
 from flask import render_template
 from flask import request
 from datetime import datetime, timedelta
-from self import self
 import holidays
 
 
