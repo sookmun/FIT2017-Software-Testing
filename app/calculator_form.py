@@ -65,10 +65,11 @@ class Calculator_Form(FlaskForm):
 
     # validate start date here
     def validate_StartDate(self, field):
-        today = date.today()
-        #nned to change here
-        if field.data>today:
-            raise ValueError("Start date should not be future dates")
+        pass
+        # today = date.today()
+        # #nned to change here
+        # if field.data>today:
+        #     raise ValueError("Start date should not be future dates")
 
     # validate start time here
     def validate_StartTime(self, field):
