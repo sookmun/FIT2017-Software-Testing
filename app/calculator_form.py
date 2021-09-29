@@ -27,11 +27,14 @@ class Calculator_Form(FlaskForm):
         elif field.data == '':
             raise ValueError("cannot fetch data")
         try:
-            field.data =int(field.data)
-            if field.data <=0:
-                raise ValueError("Capacity must be more than 0")
+            field =int(field.data)
         except:
+            # print("no me")
             raise ValueError("Capacity must be a positive integer")
+        if field <= 0:
+            # raise ValueError
+            print("me")
+            raise ValueError("Capacity must be more than 0")
 
 
     # validate initial charge here
@@ -45,10 +48,10 @@ class Calculator_Form(FlaskForm):
 
         if field.data > int(self.FinalCharge.data):
             raise ValueError("Initial charge data error")
-        elif field.data <= 0:
+        elif field.data < 0:
             raise ValueError("Initial charge must be more than 0")
         elif field.data >= 100:
-            raise  ValueError("Initial charge must be less than 100")
+            raise ValueError("Initial charge must be less than 100")
 
     # validate final charge here
     def validate_FinalCharge(self, field):
@@ -61,16 +64,12 @@ class Calculator_Form(FlaskForm):
             raise ValueError("Final Charge data error")
         elif field.data <= 0:
             raise ValueError("Final Charge must be more than 0")
-        elif field.data >= 100:
+        elif field.data > 100:
             raise ValueError("Final Charge must be less than 100")
 
     # validate start date here
     def validate_StartDate(self, field):
         pass
-        # today = date.today()
-        # #nned to change here
-        # if field.data>today:
-        #     raise ValueError("Start date should not be future dates")
 
     # validate start time here
     def validate_StartTime(self, field):

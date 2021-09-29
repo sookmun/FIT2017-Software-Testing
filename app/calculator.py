@@ -5,7 +5,7 @@ from flask import render_template
 from flask import request
 from datetime import datetime, timedelta
 import holidays
-from self import self
+
 
 
 class Calculator():
@@ -306,7 +306,6 @@ class Calculator():
             remaining_time = remaining_time - dur
             start_time = next_hour
             du.append(duration)
-
         return du
 
     def calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location):
@@ -323,6 +322,7 @@ class Calculator():
         for i in range(len(du)):
             temp = start_time.split(":")
             hr_num = int(temp[0]) + i
+            print(hr_num,start_time)
             cc = Calculator.get_cloud_cover(self, data, str(hr_num))
             total = float(si) * du[i] / float(dl) * (1-cc/100) * 50 * 0.2
             final_total.append("{:.4f}".format(total))
@@ -405,38 +405,40 @@ class Calculator():
         return final_date
 
 
-# if __name__ == "__main__":
-# #     date = "25/12/2020"
-#     # postcode = "6001"
-#     # time = "08:00"
-#     # charging_duration = "60"
-#     #
-#     # res = Calculator.calculate_solar_energy_alg1(self, date, postcode, time, charging_duration)
-#     # print(res)
-#     # initial_state = "5"
-#     # final_state = "70"
-#     # capacity = "80"
-#     # power = "50"
-#     # date = "22/02/2022"
-#     # postcode = "7250"
-#     # time = "17:30"
-#     # charging_duration = "45"
-#     # charger_config = "3"
-#
-#     # initial_state = "5"
-#     # final_state = "70"
-#     # capacity = "80"
-#     # power = "50"
-#     date = "18/09/2021"
-#     postcode = "0872"
-#     location = "aherrenge"
-#     # time = "14:00"
-#     # charging_duration = "45"
-#     # charger_config = "3"
-#     # # res = Calculator.cum_calculate_solar_energy_alg2(self, date, postcode, time, charging_duration)
-#     # res = Calculator.cost_calculation_alg1_asg2(self, date, postcode, time, charging_duration, charger_config, initial_state, final_state)
-#     # print(res)
-#     # date = Calculator.format_date(self, date)
-#     # res = Calculator.get_weather(self, date, postcode, location)
-#     # print(res)
+if __name__ == "__main__":
+    # date = "25/12/2020"
+    # postcode = "6001"
+    # time = "08:00"
+    # charging_duration = "60"
+
+    # res = Calculator.calculate_solar_energy_alg1( date, postcode, time, charging_duration)
+    # print(res)
+    # initial_state = "5"
+    # final_state = "70"
+    # capacity = "80"
+    # power = "50"
+    # date = "22/02/2022"
+    # postcode = "7250"
+    # time = "17:30"
+    # charging_duration = "45"
+    # charger_config = "3"
+
+    initial_state = "5"
+    final_state = "70"
+    # capacity = "80"
+    # power = "50"
+    date = "18/09/2021"
+    postcode = "0872"
+    location = "aherrenge"
+    time = "14:00"
+    charging_duration = "45"
+    charger_config = "3"
+    cal=Calculator()
+    res = cal.cum_calculate_solar_energy_alg2(date, postcode, time, charging_duration,location)
+    print(res)
+    # res = Calculator.cost_calculation_alg1_asg2( date, postcode, time, charging_duration, charger_config, initial_state, final_state)
+    # print(res)
+    # date = Calculator.format_date(self, date)
+    # res = Calculator.get_weather(self, date, postcode, location)
+    # print(res)
 
