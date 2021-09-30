@@ -39,6 +39,7 @@ class Calculator():
         return "{:.2f}".format(cost)
 
     def cost_calculation_alg1_asg2(self, date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location):
+        print(date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location)
         total_cost = 0
         formatted_date = Calculator.format_date(self, date)
         ref_date = Calculator.check_date(self, formatted_date)
@@ -434,8 +435,8 @@ if __name__ == "__main__":
     charging_duration = "45"
     charger_config = "3"
     cal=Calculator()
-    res = cal.cum_calculate_solar_energy_alg2(date, postcode, time, charging_duration,location)
-    print(res)
+    # res = cal.cum_calculate_solar_energy_alg2(date, postcode, time, charging_duration,location)
+    # print(res)
     # res = Calculator.cost_calculation_alg1_asg2( date, postcode, time, charging_duration, charger_config, initial_state, final_state)
     # print(res)
     # date = Calculator.format_date(self, date)

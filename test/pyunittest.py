@@ -55,15 +55,54 @@ class TestCalculator(unittest.TestCase):
     #     self.assertEqual(5.8,cal.get_solar_insolation(data),"invalid si")
     #     self.assertEqual('13.3667',cal.get_day_light_length(data))
     #     self.assertEqual(18, cal.get_cloud_cover(data, "17"))
+    #     self.assertEqual(16, cal.get_cloud_cover(data, "18"))
     #     print(cal.cum_calculate_solar_energy_alg2(date, postcode, time, charging_duration, location))
-    #     dateOne="2020-02-22"
-    #     data = cal.get_weather(dateOne, postcode, location)
-    #
-    #     self.assertEqual(6.7, cal.get_solar_insolation(data), "invalid si")
-    #     dateTwo= "2019-02-22"
+    #     # dateOne="2020-02-22"
+    #     # data = cal.get_weather(dateOne, postcode, location)
+    #     #
+    #     # self.assertEqual(6.7, cal.get_solar_insolation(data), "invalid si")
+    #     # dateTwo= "2019-02-22"
     #
     #     # res = cal.cum_calculate_solar_energy_alg2(date, postcode, time, charging_duration, location)
     #     # print(res)
+    def test_exampleOne(self):
+        cal=Calculator()
+        postcode= "6001"
+        date= "2020-12-25"
+        start_time="08:00"
+        charging_duration = "60"
+        location="perth"
+        data = cal.get_weather(date, postcode, location)
+        self.assertEqual(8.6,cal.get_solar_insolation(data),"invalid si")
+        self.assertEqual("14.2333",cal.get_day_light_length(data),"invalid dl")
+        ret= cal.calculate_solar_energy_alg1(date,postcode,start_time,charging_duration,location)
+        ret=ret[0][0]
+        self.assertEqual("6.0422",ret,"Wrong Calculation")
+
+    def test_exampleTwo(self):
+        initial_state = "5"
+        final_state = "70"
+        capacity = "80"
+        power = "50"
+        date = "2022-02-22"
+        location="launceston"
+        postcode = "7250"
+        time = "17:30"
+        charging_duration = "45"
+        charger_config = "3"
+        cal = Calculator()
+        data = cal.get_weather(date, postcode, location)
+        self.assertEqual("2021-02-22",cal.check_date(date))
+        self.assertEqual(5.8, cal.get_solar_insolation(data), "invalid si")
+        self.assertEqual("13.3667",cal.get_day_light_length(data),"invalid dl")
+        f=cal.calculate_solar_energy_alg2(date, postcode, time, "29", location)
+        self.assertEqual("1.7407",f[0][0],"Wrong Calculation")
+        d = cal.calculate_solar_energy_alg2(date, postcode, "18:00", "15", location)
+        self.assertEqual("0.9112", d[0][0], "Wrong Calculation")
+
+    
+
+
 
     def test_holiday(self):
         date = "1/1/2020"

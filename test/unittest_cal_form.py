@@ -2,6 +2,7 @@ from app.calculator_form import Calculator_Form
 import unittest
 import main as app
 from wtforms.validators import DataRequired, ValidationError, Optional
+from datetime import datetime
 class MyTestCase(unittest.TestCase):
 
     def test_validate_Baterypack(self):
@@ -57,9 +58,16 @@ class MyTestCase(unittest.TestCase):
                 form.FinalCharge.data = "101"
                 form.validate_FinalCharge(form.FinalCharge)
     def test_validate_StartDate(self):
-        pass
-    def test_validate_StartTime(self):
-        pass
+        app.ev_calculator_app.config["WTF_CSRF_ENABLED"] = False  # disable CSRF to prevent context errors
+        with app.ev_calculator_app.app_context():
+            form = Calculator_Form()
+            form.StartDate.data= datetime.strptime("31/1/18", '%d/%m/%y').date()
+            with self.assertRaises(ValueError):
+                form.validate_StartDate(form.StartDate)
+            form.StartDate.data = datetime.strptime("1/1/18", '%d/%m/%y').date()
+            with self.assertRaises(ValueError):
+                form.validate_StartDate(form.StartDate)
+
     def test_validate_ChargerCongfig(self):
         app.ev_calculator_app.config["WTF_CSRF_ENABLED"] = False  # disable CSRF to prevent context errors
         with app.ev_calculator_app.app_context():
@@ -81,6 +89,8 @@ class MyTestCase(unittest.TestCase):
             with self.assertRaises(ValueError):
                 form.PostCode.data="36000"
                 form.validate_PostCode(form.PostCode)
+
+
 
         # <test code that needs the app context>
 

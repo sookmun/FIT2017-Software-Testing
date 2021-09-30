@@ -29,11 +29,8 @@ class Calculator_Form(FlaskForm):
         try:
             field =int(field.data)
         except:
-            # print("no me")
             raise ValueError("Capacity must be a positive integer")
         if field <= 0:
-            # raise ValueError
-            print("me")
             raise ValueError("Capacity must be more than 0")
 
 
@@ -69,7 +66,9 @@ class Calculator_Form(FlaskForm):
 
     # validate start date here
     def validate_StartDate(self, field):
-        pass
+        date_time_obj = datetime.strptime('31/1/2018', '%d/%m/%Y').date()
+        if field.data <= date_time_obj:
+            raise ValueError("Date must be after February 2018")
 
     # validate start time here
     def validate_StartTime(self, field):
@@ -88,7 +87,10 @@ class Calculator_Form(FlaskForm):
     def validate_PostCode(self, field):
         url = " http://118.138.246.158/api/v1/location?postcode=" + field.data
         response = requests.get(url)
+        # print(response.ok)
         if response.status_code != 200:
             raise ValueError("This is not a valid postcode")
+        # if response.ok==False:
+        #     raise EnvironmentError
 
 
