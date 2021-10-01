@@ -11,6 +11,8 @@ build:
         - pip install -r requirements.txt
         - python3 app/calculator.py
         - python3 app/calculator_form.py
+	- python3 test/pyunittest.py.py
+	- python3 test/unittest_cal_form.py
 
 test:
     stage: test
