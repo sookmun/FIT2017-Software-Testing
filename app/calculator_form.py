@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, TimeField
 from wtforms.validators import DataRequired, ValidationError, Optional
-from datetime import date
-from app.calculator import *
+from datetime import datetime
+# from app.calculator import *
 import requests
 
 
