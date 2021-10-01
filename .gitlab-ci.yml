@@ -4,16 +4,15 @@ stages:
 
 build:
     stage: build
-    image: python:3.8-alpine
-    script: 
+    script:
         - echo "Building"
         - pip3 install --upgrade pip
-        - python3 Calendar.py
+        - python calculator_form.py
+        - python calculator.py
 
 test:
     stage: test
-    image: python:3.8-alpine
     script:
         - echo "Testing"
         - pip3 install --upgrade pip
-        - python3 CalendarTest.py
+        - python unittest_cal_form.py
