@@ -5,7 +5,6 @@ from flask import render_template
 from flask import request
 from datetime import datetime, timedelta
 import holidays
-from self import self
 
 
 
@@ -419,38 +418,3 @@ class Calculator():
         temp.reverse()
         final_date = "-".join(temp)
         return final_date
-
-#
-if __name__ == "__main__":
-    # date = "25/12/2020"
-    # postcode = "6001"
-    # time = "08:00"
-    # charging_duration = "60"
-
-    # res = Calculator.calculate_solar_energy_alg1( date, postcode, time, charging_duration)
-    # print(res)
-    # initial_state = "5"
-    # final_state = "70"
-    # capacity = "80"
-    # power = "50"
-    # date = "22/02/2022"
-    # postcode = "7250"
-    # time = "17:30"
-    # charging_duration = "45"
-    # charger_config = "3"
-
-    initial_state = "5"
-    final_state = "70"
-    # capacity = "80"
-    # power = "50"
-    date = "18/09/2021"
-    postcode = "0872"
-    location = "aherrenge"
-    time = "14:00"
-    charging_duration = "45"
-    charger_config = "3"
-    cal = Calculator()
-
-    res = cal.time_calculation("50", "70", "300", "90")
-    print(res)
-
