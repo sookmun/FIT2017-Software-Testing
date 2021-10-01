@@ -98,7 +98,7 @@ class TestCalculator(unittest.TestCase):
         d = cal.calculate_solar_energy_alg2(date, postcode, "18:00", "15", location)
         self.assertEqual("0.9112", d[0][0], "Wrong Calculation")
 
-    
+
 
 
 
