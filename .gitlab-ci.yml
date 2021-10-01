@@ -6,8 +6,6 @@ build:
     stage: build
     script:
         - echo "Building"
-        - sudo easy_install pip
-#        - pip install --upgrade pip
         - pip install -r requirement.txt
         - python3 app/calculator.py
         - python3 app/calculator_form.py
@@ -16,7 +14,6 @@ test:
     stage: test
     script:
         - echo "Testing"
-        - pip install --upgrade pip
         - pip install -r requirement.txt
         - coverage run -m pyunittest.py
         - coverage run -m unittest_cal_form.py
