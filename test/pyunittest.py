@@ -15,6 +15,9 @@ class TestCalculator(unittest.TestCase):
     cost_calculation_alg2_asg2(self, date, postcode, start_time, charging_duration, charger_configuration,initial_state, final_state, location)
     get_price(self)
     time_calculation(self, initial_state, final_state, capacity, power)
+    is_holiday(self, start_date)    **DONE**
+    is_peak(self, start_time)       **DONE**
+    charger_configuration(self, charger_config)  **DONE**
     get_solar_energy_duration(self, data, start_time, charging_duration)
     get_day_light_length(self, data)
     get_solar_insolation(self, data)
@@ -23,10 +26,16 @@ class TestCalculator(unittest.TestCase):
     get_du(self)
     calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location)
     cum_calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location)
+    get_weather(self, date, postcode, location)     THIS USES THE API
+    check_date(self, date)
     """
 
     # you may create more test methods
     # you may add parameters to test methods
+    # this is an example
+    # def test_cost(self):
+    #     self.calculator = Calculator()
+    #     self.assertEqual(self.calculator.cost_calculation("", "", "", "", ""), "")
 
     # def test_general(self):
     #     initial_state = "5"
@@ -1650,8 +1659,6 @@ class TestCalculator(unittest.TestCase):
     #     d = cal.calculate_solar_energy_alg2(date, postcode, "18:00", "15", location)
     #     self.assertEqual("0.9112", d[0][0], "Wrong Calculation")
 
-
-    # you may create test suite if needed
 if __name__ == "__main__":
     suit = unittest.TestLoader().loadTestsFromTestCase(TestCalculator)
     unittest.TextTestRunner(verbosity=2).run(suit)
