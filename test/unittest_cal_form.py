@@ -91,10 +91,6 @@ class MyTestCase(unittest.TestCase):
                 form.validate_PostCode(form.PostCode)
 
 
-
-        # <test code that needs the app context>
-
-
 if __name__ == '__main__':
     unittest.main()
 
