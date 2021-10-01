@@ -4,20 +4,22 @@ stages:
 
 build:
     stage: build
+    image: python:3.8-alpine
     script:
         - echo "Building"
         - pip3 install --upgrade pip
-        - pip install -r requirement.txt
+        - pip install -r requirements.txt
         - python3 app/calculator.py
         - python3 app/calculator_form.py
 
 test:
     stage: test
+    image: python:3.8-alpine
     script:
         - echo "Testing"
         - pip3 install --upgrade pip
-        - pip install -r requirement.txt
-        - coverage run -m pyunittest.py
-        - coverage run -m unittest_cal_form.py
+        - pip install -r requirements.txt
+        - coverage run -m test/pyunittest.py
+        - coverage run -m test/unittest_cal_form.py
         - coverage report
         - coverage html
