@@ -1,9 +1,9 @@
-from app.calculator_form import Calculator_Form
 import unittest
+from app.calculator_form import Calculator_Form
 import main as app
 from wtforms.validators import DataRequired, ValidationError, Optional
 from datetime import datetime
-class MyTestCase(unittest.TestCase):
+class TestCalculatorForm(unittest.TestCase):
 
     def test_validate_Baterypack(self):
         app.ev_calculator_app.config["WTF_CSRF_ENABLED"] = False  # disable CSRF to prevent context errors
@@ -92,5 +92,6 @@ class MyTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    suit = unittest.TestLoader().loadTestsFromTestCase(TestCalculatorForm)
+    unittest.TextTestRunner(verbosity=2).run(suit)
 

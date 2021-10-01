@@ -1,6 +1,7 @@
+import unittest
 from app.calculator import Calculator
 from app.calculator_form import Calculator_Form
-import unittest
+
 from datetime import datetime
 import main as app
 from wtforms.validators import DataRequired, ValidationError, Optional
