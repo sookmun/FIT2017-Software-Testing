@@ -5,9 +5,7 @@ from datetime import datetime
 import main as app
 from wtforms.validators import DataRequired, ValidationError, Optional
 from wtforms import StringField, DateField, TimeField
-import mock
-
-
+from unittest.mock import Mock
 
 class TestCalculator(unittest.TestCase):
     """
