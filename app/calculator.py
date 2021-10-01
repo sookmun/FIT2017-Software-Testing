@@ -5,6 +5,7 @@ from flask import render_template
 from flask import request
 from datetime import datetime, timedelta
 import holidays
+from self import self
 
 
 
@@ -39,7 +40,6 @@ class Calculator():
         return "{:.2f}".format(cost)
 
     def cost_calculation_alg1_asg2(self, date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location):
-        print(date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location)
         total_cost = 0
         formatted_date = Calculator.format_date(self, date)
         ref_date = Calculator.check_date(self, formatted_date)
@@ -104,6 +104,8 @@ class Calculator():
         return "{:.2f}".format(total_cost)
 
     def get_price(self):
+        # returns an array that shows the price of each period
+        # e.g. [0.5, 0.5] represents half price for both period
         price = []
         duration = Calculator.duration
         start_time = Calculator.start_time
@@ -185,7 +187,7 @@ class Calculator():
         return Calculator.power
 
     def get_solar_energy_duration(self, data, start_time, charging_duration):
-
+        # check if the whole charging duration is during the solar period
         sunset = data["sunset"]
         sunrise = data["sunrise"]
         # sunrise = "06:00:00"
@@ -273,9 +275,11 @@ class Calculator():
         return cloud_cover
 
     def calculate_solar_energy_alg1(self, date, postcode, start_time, charging_duration, location):
+        # calculate the solar energy based on AlG 1
         total = 0
         final_total = []
-        data = Calculator.get_weather(self, date, postcode, location)
+        weather_data = Calculator.get_link_weather(self, postcode)
+        data = Calculator.get_weather(self, weather_data, date, location)
         si = Calculator.get_solar_insolation(self, data)
         dl = Calculator.get_day_light_length(self, data)
         Calculator.get_solar_energy_duration(self, data, start_time, charging_duration)
@@ -286,6 +290,8 @@ class Calculator():
         return final_total, du
 
     def get_du(self):
+        # returns an array that has the amount of time in an hour
+        # e.g [1.0, 0.5] represents full 1 hour + 30 min for the second period
         du = []
         duration = Calculator.duration
         start_time = Calculator.start_time
@@ -310,11 +316,11 @@ class Calculator():
         return du
 
     def calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location):
+        # calculate the solar energy based on ALG2 for a year
         total = 0
         final_total = []
-        # formatted_date = Calculator.format_date(self, date)
-        # ref_date = Calculator.check_date(self, formatted_date)
-        data = Calculator.get_weather(self, date, postcode, location)
+        weather_data = Calculator.get_link_weather(self, postcode)
+        data = Calculator.get_weather(self, weather_data, date, location)
         si = Calculator.get_solar_insolation(self, data)
         dl = Calculator.get_day_light_length(self, data)
         Calculator.get_solar_energy_duration(self, data, start_time, charging_duration)
@@ -331,6 +337,7 @@ class Calculator():
         return final_total, du
 
     def cum_calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location):
+        # calculate the solar energy based on ALG2 for preceding years
         total = []
         date = Calculator.format_date(self, date)
 
@@ -346,11 +353,15 @@ class Calculator():
 
         return total
 
-    def get_weather(self, date, postcode, location):
-        """get information from weather api  through the postcode """
+    def get_link_weather(self, postcode):
         url = 'http://118.138.246.158/api/v1/location?postcode={postcode}'.format(postcode=postcode)
         temp = requests.get(url)
         data = temp.json()
+
+        return data
+
+    def get_weather(self, data, date, location):
+        """get information from weather api  through the postcode """
         location = location.upper()
         for i in range(len(data)):
             location_name = data[i]["name"]
@@ -377,12 +388,16 @@ class Calculator():
             input.insert(0, str(current_year))
 
         # check for future month
-        if int(input[2]) > current_year:
+        if int(input[1]) > int(current[1]):
             current_month = int(current[1])
             input_month = int(input[1])
             if input_month > current_month:
                 input.pop(1)
                 input.insert(1, str(current_month))
+
+                if int(input[2]) > int(current[2]):
+                    input.pop(2)
+                    input.insert(2, current[2])
 
         # check if the day valid for that new month
         days = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -405,7 +420,7 @@ class Calculator():
         final_date = "-".join(temp)
         return final_date
 
-
+#
 if __name__ == "__main__":
     # date = "25/12/2020"
     # postcode = "6001"
@@ -434,12 +449,8 @@ if __name__ == "__main__":
     time = "14:00"
     charging_duration = "45"
     charger_config = "3"
-    cal=Calculator()
-    # res = cal.cum_calculate_solar_energy_alg2(date, postcode, time, charging_duration,location)
-    # print(res)
-    # res = Calculator.cost_calculation_alg1_asg2( date, postcode, time, charging_duration, charger_config, initial_state, final_state)
-    # print(res)
-    # date = Calculator.format_date(self, date)
-    # res = Calculator.get_weather(self, date, postcode, location)
-    # print(res)
+    cal = Calculator()
+
+    res = cal.time_calculation("50", "70", "300", "90")
+    print(res)
 
