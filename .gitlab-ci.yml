@@ -21,6 +21,7 @@ test:
         - pip install -r requirements.txt
 #        - coverage run -m unittest_cal
         - coverage run --source=app --branch -m unittest test/unittest_cal.py
+        - coverage run --source=app --branch -m unittest test/unittest_cal_form.py
 #        - coverage run -m unittest_cal_form
         - coverage report
         - coverage html

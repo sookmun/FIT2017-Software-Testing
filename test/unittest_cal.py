@@ -1212,7 +1212,7 @@ class TestCalculator(unittest.TestCase):
         with patch('app.calculator.requests.get') as mock_get:
             mock_get.return_value.json.return_value = weather_data
 
-            response = cal2.get_weather(postcode_data, "2020-12-25", "PERTH")
+            response = cal2.get_weather(postcode_data, "2020-12-25", "Launceston")
 
         mock_get.assert_called()
 
@@ -1562,7 +1562,7 @@ class TestCalculator(unittest.TestCase):
         with patch('app.calculator.requests.get') as mock_get:
             mock_get.return_value.json.return_value = weather_data
 
-            response = cal.get_weather(postcode_data, "2020-12-25", "PERTH")
+            response = cal.get_weather(postcode_data, "2020-12-25", "Launceston")
 
         mock_get.assert_called()
 
