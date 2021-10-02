@@ -989,7 +989,7 @@ class TestCalculator(unittest.TestCase):
 
         mock_get.assert_called()
 
-        self.assertEqual(cal.calculate_solar_energy_alg2("2020-12-25", "7250", "17:30", "45", "Launceston"), (['1.5207', '0.7993'], [0.5, 0.25]))
+        self.assertEqual(cal.calculate_solar_energy_alg2("2020-12-25", "7250", "17:30", "45", "Launceston"), (['1.5987', '0.8286'], [0.5, 0.25]))
 
     def test_cum_calculate_solar_energy_alg2(self):
         postcode_data = [
@@ -1220,7 +1220,7 @@ class TestCalculator(unittest.TestCase):
         mock_get.assert_called()
 
         self.assertEqual(cal.cum_calculate_solar_energy_alg2("2020-12-25", "7250", "17:30", "45", "Launceston"),
-                         [(['1.5987', '0.8286'], [0.5, 0.25]),
+                         [(['1.5207', '0.7993'], [0.5, 0.25]),
                           (['2.1120', '1.0333'], [0.5, 0.25]),
                           (['1.3876', '0.7452'], [0.5, 0.25])])
 
