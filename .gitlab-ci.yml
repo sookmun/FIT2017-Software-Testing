@@ -19,9 +19,7 @@ test:
         - echo "Testing"
         - pip3 install --upgrade pip
         - pip install -r requirements.txt
-#        - coverage run -m unittest_cal
         - coverage run --source=app --branch -m unittest test/test_unittest_cal.py
         - coverage run --source=app --branch -m unittest test/test_unittest_cal_form.py
-#        - coverage run -m unittest_cal_form
         - coverage report
         - coverage html
