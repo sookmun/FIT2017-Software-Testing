@@ -1,13 +1,21 @@
 import unittest
 from app.calculator_form import Calculator_Form
+import sys
+# sys.path.append('/.../project')
 import main as app
 from wtforms.validators import DataRequired, ValidationError, Optional
 from datetime import datetime
+# sys.path.append('/.../project/app')
+# from app import calculator_form as hi
+
+
+
 class TestCalculatorForm(unittest.TestCase):
 
     def test_validate_Baterypack(self):
         app.ev_calculator_app.config["WTF_CSRF_ENABLED"] = False  # disable CSRF to prevent context errors
         with app.ev_calculator_app.app_context():
+            # form=hi.Calculator_Form()
             form = Calculator_Form()
             form.BatteryPackCapacity.data = "-1"
             with self.assertRaises(ValueError):
