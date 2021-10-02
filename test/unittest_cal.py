@@ -987,7 +987,7 @@ class TestCalculator(unittest.TestCase):
             response = cal3.get_weather(postcode_data, "2020-12-25", "Launceston")
 
         mock_get.assert_called()
-        self.assertEqual(cal3.calculate_solar_energy_alg2("2020-12-23", "7250", "17:30", "45", "Launceston"), (['1.5987', '0.8286'], [0.5, 0.25]))
+        self.assertEqual(cal3.calculate_solar_energy_alg2("2020-12-23", "7250", "17:30", "45", "Launceston"), (['1.5207', '0.7993'], [0.5, 0.25]))
 
     def test_cum_calculate_solar_energy_alg2(self):
         postcode_data = [
