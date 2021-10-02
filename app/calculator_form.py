@@ -66,6 +66,7 @@ class Calculator_Form(FlaskForm):
 
     # validate start date here
     def validate_StartDate(self, field):
+        #only accepts date after February 2018 because of weather API
         date_time_obj = datetime.strptime('31/1/2018', '%d/%m/%Y').date()
         if field.data <= date_time_obj:
             raise ValueError("Date must be after February 2018")
@@ -80,17 +81,15 @@ class Calculator_Form(FlaskForm):
             field.data = int(field.data)
         except:
             raise ValueError("Charger Configuration must be an integer")
-        if field.data <= 0 or field.data > 8:
+        if field.data <= 0 or field.data > 8: #boundary testing of 1-8
             raise ValueError("Incorect Configuration. Choose a value between 1-8")
 
     # validate postcode here
     def validate_PostCode(self, field):
         url = " http://118.138.246.158/api/v1/location?postcode=" + field.data
         response = requests.get(url)
-        # print(response.ok)
-        if response.status_code != 200:
+        if response.status_code != 200: #if the postcode is invalid raise value error
             raise ValueError("This is not a valid postcode")
-        # if response.ok==False:
-        #     raise EnvironmentError
+
 
 
