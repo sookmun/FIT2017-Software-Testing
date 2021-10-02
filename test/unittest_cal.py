@@ -896,8 +896,8 @@ class TestCalculator(unittest.TestCase):
         with patch('app.calculator.requests.get') as mock_get:
             mock_get.return_value.json.return_value = postcode_data
 
-            cal = Calculator()
-            response = cal.get_link_weather("7250")
+            cal3 = Calculator()
+            response = cal3.get_link_weather("7250")
 
         mock_get.assert_called()
         weather_data = {"date": "2021-02-22", "sunrise": "05:44:00", "sunset": "19:06:00", "moonrise": "15:43:00",
@@ -984,12 +984,10 @@ class TestCalculator(unittest.TestCase):
         with patch('app.calculator.requests.get') as mock_get:
             mock_get.return_value.json.return_value = weather_data
 
-            cal = Calculator()
-            response = cal.get_weather(postcode_data, "2020-12-25", "PERTH")
+            response = cal3.get_weather(postcode_data, "2020-12-25", "Launceston")
 
         mock_get.assert_called()
-
-        self.assertEqual(cal.calculate_solar_energy_alg2("2020-12-25", "7250", "17:30", "45", "Launceston"), (['1.5987', '0.8286'], [0.5, 0.25]))
+        self.assertEqual(cal3.calculate_solar_energy_alg2("2020-12-23", "7250", "17:30", "45", "Launceston"), (['1.5207', '0.7993'], [0.5, 0.25]))
 
     def test_cum_calculate_solar_energy_alg2(self):
         postcode_data = [
@@ -1087,8 +1085,8 @@ class TestCalculator(unittest.TestCase):
         with patch('app.calculator.requests.get') as mock_get:
             mock_get.return_value.json.return_value = postcode_data
 
-            cal = Calculator()
-            response = cal.get_link_weather("7250")
+            cal2 = Calculator()
+            response = cal2.get_link_weather("7250")
 
         mock_get.assert_called()
         weather_data = {"date": "2021-02-22", "sunrise": "05:44:00", "sunset": "19:06:00", "moonrise": "15:43:00",
@@ -1214,12 +1212,12 @@ class TestCalculator(unittest.TestCase):
         with patch('app.calculator.requests.get') as mock_get:
             mock_get.return_value.json.return_value = weather_data
 
-            cal = Calculator()
-            response = cal.get_weather(postcode_data, "2020-12-25", "PERTH")
+            cal2 = Calculator()
+            response = cal2.get_weather(postcode_data, "2020-12-25", "PERTH")
 
         mock_get.assert_called()
 
-        self.assertEqual(cal.cum_calculate_solar_energy_alg2("2020-12-25", "7250", "17:30", "45", "Launceston"),
+        self.assertEqual(cal2.cum_calculate_solar_energy_alg2("2020-12-25", "7250", "17:30", "45", "Launceston"),
                          [(['1.5207', '0.7993'], [0.5, 0.25]),
                           (['2.1120', '1.0333'], [0.5, 0.25]),
                           (['1.3876', '0.7452'], [0.5, 0.25])])
