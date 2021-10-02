@@ -987,7 +987,7 @@ class TestCalculator(unittest.TestCase):
             response = cal3.get_weather(postcode_data, "2020-12-25", "Launceston")
 
         mock_get.assert_called()
-        self.assertEqual(cal3.calculate_solar_energy_alg2("2020-12-23", "7250", "17:30", "45", "Launceston"), (['1.5207', '0.7993'], [0.5, 0.25]))
+        self.assertEqual(cal3.calculate_solar_energy_alg2("2020-12-23", "7250", "17:30", "45", "Launceston"), (['1.5987', '0.8286'], [0.5, 0.25]))
 
     def test_cum_calculate_solar_energy_alg2(self):
         postcode_data = [
@@ -1212,7 +1212,6 @@ class TestCalculator(unittest.TestCase):
         with patch('app.calculator.requests.get') as mock_get:
             mock_get.return_value.json.return_value = weather_data
 
-            cal2 = Calculator()
             response = cal2.get_weather(postcode_data, "2020-12-25", "PERTH")
 
         mock_get.assert_called()
@@ -1563,15 +1562,13 @@ class TestCalculator(unittest.TestCase):
         with patch('app.calculator.requests.get') as mock_get:
             mock_get.return_value.json.return_value = weather_data
 
-            cal = Calculator()
             response = cal.get_weather(postcode_data, "2020-12-25", "PERTH")
 
         mock_get.assert_called()
 
         # self, date, postcode, start_time, charging_duration, charger_configuration,
         #                                    initial_state, final_state, location):
-        self.assertEqual(cal.cost_calculation_alg2_asg2("2020-12-25", "7250", "17:30", "45", "5", "20", "75", "Launceston",),
-                         "19.22")
+        self.assertEqual(cal.cost_calculation_alg2_asg2("2020-12-25", "7250", "17:30", "45", "5", "20", "75", "Launceston",), "19.22")
 
     # def test_exampleTwo(self):
     #     initial_state = "5"
