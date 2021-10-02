@@ -19,7 +19,7 @@ test:
         - echo "Testing"
         - pip3 install --upgrade pip
         - pip install -r requirements.txt
-        - coverage run -m unittest
+        - coverage run -m unittest_cal
         - coverage run -m unittest_cal_form
         - coverage report
         - coverage html

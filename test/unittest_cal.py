@@ -1,7 +1,5 @@
 import unittest
 from app.calculator import Calculator
-from app.calculator_form import Calculator_Form
-
 from datetime import datetime
 import main as app
 from wtforms.validators import DataRequired, ValidationError, Optional
@@ -11,73 +9,9 @@ from unittest import mock
 
 class TestCalculator(unittest.TestCase):
     """
-    cost_calculation_alg1_asg1(self, date, start_time, initial_state, final_state, capacity, charger_config)
-    cost_calculation_alg1_asg2(self, date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location)
-    cost_calculation_alg2_asg2(self, date, postcode, start_time, charging_duration, charger_configuration,initial_state, final_state, location)
-    get_price(self)
-    time_calculation(self, initial_state, final_state, capacity, power)
-    is_holiday(self, start_date)    **DONE**
-    is_peak(self, start_time)       **DONE**
-    charger_configuration(self, charger_config)  **DONE**
-    get_solar_energy_duration(self, data, start_time, charging_duration)
-    get_day_light_length(self, data)
-    get_solar_insolation(self, data)
-    get_cloud_cover(self, data, start_time)
-    calculate_solar_energy_alg1(self, date, postcode, start_time, charging_duration, location)
-    get_du(self)
-    calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location)
-    cum_calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location)
-    get_weather(self, date, postcode, location)     THIS USES THE API
-    check_date(self, date)
+    This test class test all the functions in calculator.py
     """
-
-    # you may create more test methods
-    # you may add parameters to test methods
-    # this is an example
-    # def test_cost(self):
-    #     self.calculator = Calculator()
-    #     self.assertEqual(self.calculator.cost_calculation("", "", "", "", ""), "")
-
-    # def test_general(self):
-    #     initial_state = "5"
-    #     final_state = "70"
-    #     capacity = "80"
-    #     power = "50"
-    #     date = "2022-02-22"
-    #     location="launceston"
-    #     postcode = "7250"
-    #     time = "17:30"
-    #     charging_duration = "45"
-    #     charger_config = "3"
-    #     cal = Calculator()
-    #     data = cal.get_weather(date, postcode, location)
-    #     self.assertEqual("2021-02-22",cal.check_date(date),"invalid date")
-    #     self.assertEqual(5.8,cal.get_solar_insolation(data),"invalid si")
-    #     self.assertEqual('13.3667',cal.get_day_light_length(data))
-    #     self.assertEqual(18, cal.get_cloud_cover(data, "17"))
-    #     self.assertEqual(16, cal.get_cloud_cover(data, "18"))
-    #     print(cal.cum_calculate_solar_energy_alg2(date, postcode, time, charging_duration, location))
-    #     # dateOne="2020-02-22"
-    #     # data = cal.get_weather(dateOne, postcode, location)
-    #     #
-    #     # self.assertEqual(6.7, cal.get_solar_insolation(data), "invalid si")
-    #     # dateTwo= "2019-02-22"
-    #
-    #     # res = cal.cum_calculate_solar_energy_alg2(date, postcode, time, charging_duration, location)
-    #     # print(res)
-    # def test_exampleOne(self):
-    #     cal=Calculator()
-    #     postcode= "6001"
-    #     date= "2020-12-25"
-    #     start_time="08:00"
-    #     charging_duration = "60"
-    #     location="perth"
-    #     data = cal.get_weather(date, postcode, location)
-    #     self.assertEqual(8.6,cal.get_solar_insolation(data),"invalid si")
-    #     self.assertEqual("14.2333",cal.get_day_light_length(data),"invalid dl")
-    #     ret= cal.calculate_solar_energy_alg1(date,postcode,start_time,charging_duration,location)
-    #     ret=ret[0][0]
-    #     self.assertEqual("6.0422",ret,"Wrong Calculation")
+    
     def test_get_link_weather(self):
         postcode_data = [{"id":"ab9f494f-f8a0-4c24-bd2e-2497b99f2258","postcode":"3800","name":"MONASH UNIVERSITY","state":"VIC","latitude":"-37.9105599","longitude":"145.1362485","distanceToNearestWeatherStationMetres":3771.993796218797,"nearestWeatherStation":{"name":"OAKLEIGH (METROPOLITAN GOLF CLUB)","state":"VIC","latitude":"-37.9142","longitude":"145.0935"}}]
         with patch('app.calculator.requests.get') as mock_get:
