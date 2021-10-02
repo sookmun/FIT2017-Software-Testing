@@ -689,8 +689,9 @@ class TestCalculator(unittest.TestCase):
                  "windspeedKph": 8, "windDirectionDeg": 104, "windDirectionCompass": "ESE", "precipitationMm": 0,
                  "humidityPct": 78, "visibilityKm": 10, "pressureMb": 1016}]}
         # data, start_time, charging_duration
-        self.assertEqual(cal.get_solar_energy_duration(weather_data1, "09:00", "90"), 90)
         self.assertEqual(cal.get_solar_energy_duration(weather_data1, "05:00", "90"), 0)
+        self.assertEqual(cal.get_solar_energy_duration(weather_data1, "07:00", "90"), 70)
+        self.assertEqual(cal.get_solar_energy_duration(weather_data1, "09:00", "90"), 90)
         self.assertEqual(cal.get_solar_energy_duration(weather_data1, "17:00", "90"), 32)
 
     def test_get_du(self):
@@ -1219,7 +1220,7 @@ class TestCalculator(unittest.TestCase):
         mock_get.assert_called()
 
         self.assertEqual(cal.cum_calculate_solar_energy_alg2("2020-12-25", "7250", "17:30", "45", "Launceston"),
-                         [(['1.5207', '0.7993'], [0.5, 0.25]),
+                         [(['1.5987', '0.8286'], [0.5, 0.25]),
                           (['2.1120', '1.0333'], [0.5, 0.25]),
                           (['1.3876', '0.7452'], [0.5, 0.25])])
 
@@ -1228,6 +1229,7 @@ class TestCalculator(unittest.TestCase):
         cal = Calculator()
         self.assertEqual(cal.cost_calculation_alg1_asg1("25/12/2020", "08:00", "10", "30", "350", "3"), "14.00")
         self.assertEqual(cal.cost_calculation_alg1_asg1("22/02/2022", "17:30", "15", "20", "100", "2"), "0.75")
+        self.assertEqual(cal.cost_calculation_alg1_asg1("22/02/2022", "05:00", "15", "20", "100", "2"), "0.38")
 
     def test_cost_calculation_alg1_asg2(self):
         # date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location

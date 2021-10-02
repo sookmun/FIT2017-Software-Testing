@@ -336,7 +336,7 @@ class Calculator():
         return final_total, du
 
     def cum_calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location):
-        # calculate the solar energy based on ALG2 for preceding years
+        # calculate the solar energy based on ALG2 for preceeding years
         total = []
         date = Calculator.format_date(self, date)
 
