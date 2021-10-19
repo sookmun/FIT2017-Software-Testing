@@ -181,7 +181,7 @@ class TestCalculatorForm(unittest.TestCase):
         with app.ev_calculator_app.app_context():
             form = Calculator_Form()
             with self.assertRaises(ValueError):
-                form.PostCode.data="36000"          # raises an error when postcode is invalid
+                form.PostCode.data = "36000"          # raises an error when postcode is invalid
                 form.validate_PostCode(form.PostCode)
             with self.assertRaises(ValueError):
                 form.PostCode.data = "abc"          # ensuring is not a random string
@@ -189,7 +189,7 @@ class TestCalculatorForm(unittest.TestCase):
 
             # ensuring valid postcode is accepted
             try:
-                form.PostCode.data="3800"
+                form.PostCode.data = "3800"
                 form.validate_PostCode(form.PostCode)
             except:
                 raise ValidationError("This input should be accepted")
