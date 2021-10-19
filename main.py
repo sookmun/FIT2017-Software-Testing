@@ -44,9 +44,9 @@ def operation_result():
 
         charging_duration = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)
 
-        cost1 = calculator.cost_calculation_alg1_asg1(start_date, start_time, initial_charge, final_charge, battery_capacity, charger_configuration)
-        cost2 = calculator.cost_calculation_alg1_asg2(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
-        cost3 = calculator.cost_calculation_alg2_asg2(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
+        cost1 = calculator.cost_calculation(start_date, start_time, initial_charge, final_charge, battery_capacity, charger_configuration)
+        cost2 = calculator.cost_cal_without_hourly_weather(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
+        cost3 = calculator.cost_cal_with_hourly_weather(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
         # cost = calculator.cost_calculation(initial_charge, final_charge, battery_capacity, is_peak, is_holiday)
 
         # time = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)

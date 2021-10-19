@@ -1,14 +1,12 @@
 import requests
-from decimal import Decimal
-from flask import Flask, flash
-from flask import render_template
-from flask import request
 from datetime import datetime, timedelta
 import holidays
 
 
-
 class Calculator():
+    """
+    Calculator class for the Joules Up EV Charging Calculator
+    """
     # you can choose to initialise variables here, if needed.
     period = 1
     power = 0
@@ -19,12 +17,19 @@ class Calculator():
     def __init__(self):
         pass
 
-    def cost_calculation_alg1_asg1(self, date, start_time, initial_state, final_state, capacity, charger_config):
+    def cost_calculation(self, date, start_time, initial_state, final_state, capacity, charger_config):
+        """
+        This function is used to calculate the charging cost based on the formula in our assignment 2 specs
+        Cost = ( Final SoC - Initial SoC ) * Capacity * Base Price * Surcharge
+        """
+        # format the date into an accepted date for the functions
         formatted_date = Calculator.format_date(self, date)
         ref_date = Calculator.check_date(self, formatted_date)
-        Calculator.charger_configuration(self, charger_config)
+        # find the charger configuration for the charger
+        Calculator.get_charger_configuration(self, charger_config)
         current = datetime.strptime(start_time, "%H:%M")
 
+        # check for peak time and holiday
         if Calculator.is_peak(self, current):
             price = Calculator.price * 2
         else:
@@ -35,18 +40,28 @@ class Calculator():
         else:
             surcharge_factor = 1
 
+        # calculate the cost using the formula
         cost = (float(final_state) - float(initial_state)) / 100 * float(capacity) * float(price) / 100 * surcharge_factor
         return "{:.2f}".format(cost)
 
-    def cost_calculation_alg1_asg2(self, date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location):
+    def cost_cal_without_hourly_weather(self, date, postcode, start_time, charging_duration, charger_configuration, initial_state, final_state, location):
+        """
+        This function calculate the cost from 1st July 2008 up to the current date-2 only. The calculation is done without
+        considering hourly weather conditions.
+        Formula : SoC * Net_energy * surcharge * price
+        """
         total_cost = 0
         formatted_date = Calculator.format_date(self, date)
         ref_date = Calculator.check_date(self, formatted_date)
-        Calculator.charger_configuration(self, charger_configuration)
-        energy = Calculator.calculate_solar_energy_alg1(self, ref_date, postcode, start_time, charging_duration, location)
+        Calculator.get_charger_configuration(self, charger_configuration)
+        # calculate the solar energy
+        energy = Calculator.solar_energy_cal_without_future(self, ref_date, postcode, start_time, charging_duration, location)
+        # energy is a tuple while the first element is the solar energy and second element is the duration of each
+        # partial hour
         solar_energy = energy[0]
         du = energy[1]
         price = Calculator.get_price(self)
+        # calculate the cost for each partial hour
         for i in range(len(solar_energy)):
             solar = solar_energy[i]
             energy_drawn = Calculator.power * du[i]
@@ -64,14 +79,21 @@ class Calculator():
 
         return "{:.2f}".format(total_cost)
 
-    def cost_calculation_alg2_asg2(self, date, postcode, start_time, charging_duration, charger_configuration,
+    def cost_cal_with_hourly_weather(self, date, postcode, start_time, charging_duration, charger_configuration,
                                    initial_state, final_state, location):
+        """
+        This function calculate the charging cost with the addition of solar energy generation, with the date extending
+        to the future. Moreover, the calculation needs to take into account hourly weather conditions.
+        Formula: soc * net_energy * surcharge * price
+        """
         total_cost = 0
         formatted_date = Calculator.format_date(self, date)
         ref_date = Calculator.check_date(self, formatted_date)
-        Calculator.charger_configuration(self, charger_configuration)
-        energy = Calculator.cum_calculate_solar_energy_alg2(self, ref_date, postcode, start_time, charging_duration, location)
+        Calculator.get_charger_configuration(self, charger_configuration)
+        # find the solar energy for each years and the duration of each solar energy period
+        energy = Calculator.solar_energy_cal_preceeding_years(self, ref_date, postcode, start_time, charging_duration, location)
         price = Calculator.get_price(self)
+        # calculate the cost for each period and sum them up
         for i in range(len(energy)):
             info = energy[i]
             for j in range(len(info)):
@@ -103,13 +125,17 @@ class Calculator():
         return "{:.2f}".format(total_cost)
 
     def get_price(self):
-        # returns an array that shows the price of each period
-        # e.g. [0.5, 0.5] represents half price for both period
+        """
+        This function finds the price of each period.
+        e.g. [0.5, 0.5] represents half price for both period
+        """
         price = []
         duration = Calculator.duration
         start_time = Calculator.start_time
         remaining_time = duration
         start_time = datetime.strptime(start_time, '%H:%M')
+        # keep running until there are no time remaining
+        # finds how long does each period last
         while remaining_time > 0:
             if Calculator.is_peak(self, start_time):
                 price.append(1.0)
@@ -133,12 +159,18 @@ class Calculator():
 
     # you may add more parameters if needed, you may also modify the formula.
     def time_calculation(self, initial_state, final_state, capacity, power):
+        """
+        This function calculates the total time for the whole charging period
+        """
         time = ((float(final_state) - float(initial_state)) / 100 * float(capacity) / float(power)) * 60
         time_str = "{:.2f}".format(time)
         return time_str
 
     # you may create some new methods at your convenience, or modify these methods, or choose not to use them.
     def is_holiday(self, start_date):
+        """
+        This functions checks if a date is a holiday in Australia
+        """
         date = Calculator.format_date(self, start_date)
         ref_date = Calculator.check_date(self, date)
         aus_holidays = holidays.AUS()
@@ -146,17 +178,20 @@ class Calculator():
             return True
         return False
 
-
     def is_peak(self, start_time):
+        """
+        This function checks if a time is a peak hour
+        """
         peak_start = "06:00"
         peak_end = "18:00"
-        # given_time = datetime.strptime(start_time, '%H:%M')
         peak_start_time = datetime.strptime(peak_start, '%H:%M')
         peak_end_time = datetime.strptime(peak_end, '%H:%M')
         return peak_start_time <= start_time < peak_end_time
 
-
-    def charger_configuration(self, charger_config):
+    def get_charger_configuration(self, charger_config):
+        """
+        This functions finds our the power and base price based on the charger configuration.
+        """
         config = int(charger_config)
         if config == 1:
             Calculator.power = 2
@@ -186,11 +221,15 @@ class Calculator():
         return Calculator.power
 
     def get_solar_energy_duration(self, data, start_time, charging_duration):
+        """
+        This function checks if the whole charging duration is during the the solar period and return the amount of
+        time in the solar period.
+        e.g. Starts from 5 a.m. and have a duration of 3 hours. The sunrise is at 6:30 a.m. Hence, the final duration
+        is only 1.5 hours.
+        """
         # check if the whole charging duration is during the solar period
         sunset = data["sunset"]
         sunrise = data["sunrise"]
-        # sunrise = "06:00:00"
-        # sunset = "18:00:00"
 
         sunset_time = datetime.strptime(sunset, '%H:%M:%S')
         sunrise_time = datetime.strptime(sunrise, '%H:%M:%S')
@@ -247,6 +286,9 @@ class Calculator():
 
     # to be acquired through API
     def get_day_light_length(self, data):
+        """
+        This function calculates the daylight length based on the time of sunrise and sunset.
+        """
 
         sunset = data["sunset"]
         sunrise = data["sunrise"]
@@ -263,34 +305,51 @@ class Calculator():
 
     # to be acquired through API
     def get_solar_insolation(self, data):
-        """ same sun hour on the same day"""
+        """
+        This function finds the solar insolation from the weather API
+        """
         solar_insolation = data["sunHours"]
         return solar_insolation
 
     # to be acquired through API
     def get_cloud_cover(self, data, start_time):
-        """ need to retrieve hourly cloud value"""
+        """
+        This function retrieve hourly cloud value from the weather API
+        """
         cloud_cover = data["hourlyWeatherHistory"][int(start_time)]["cloudCoverPct"]
         return cloud_cover
 
-    def calculate_solar_energy_alg1(self, date, postcode, start_time, charging_duration, location):
+    def solar_energy_cal_without_future(self, date, postcode, start_time, charging_duration, location):
+        """
+        This function calculates the solar energy only considering the date from 1st July 2008 up to the current date-2
+        only without considering hourly weather conditions.
+        Formula : si * du/dl * 50 * 0.20
+        """
         # calculate the solar energy based on AlG 1
         total = 0
         final_total = []
         weather_data = Calculator.get_link_weather(self, postcode)
+        # retrieve data from the weather API
         data = Calculator.get_weather(self, weather_data, date, location)
+        # retrieve solar insolation
         si = Calculator.get_solar_insolation(self, data)
+        # retrieve daylight length
         dl = Calculator.get_day_light_length(self, data)
+        # calculates the duration
         Calculator.get_solar_energy_duration(self, data, start_time, charging_duration)
         du = Calculator.get_du(self)
+        # calculate the solar energy for each partial period
         for i in range(len(du)):
             total = float(si) * du[i] / float(dl) * 50 * 0.2
             final_total.append("{:.4f}".format(total))
         return final_total, du
 
     def get_du(self):
-        # returns an array that has the amount of time in an hour
-        # e.g [1.0, 0.5] represents full 1 hour + 30 min for the second period
+        """
+        This function finds the amount of time in an hour depending on the number of periods and returns returns an
+        array that has the amount of time in an hour
+        e.g. [1.0, 0.5] represents full 1 hour + 30 min for the second period
+        """
         du = []
         duration = Calculator.duration
         start_time = Calculator.start_time
@@ -314,7 +373,12 @@ class Calculator():
             du.append(duration)
         return du
 
-    def calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location):
+    def solar_energy_with_future(self, date, postcode, start_time, charging_duration, location):
+        """
+        This function calculates the solar energy only considering the date from 1st July 2008 up to the current date-2
+        only without considering hourly weather conditions.
+        Formula : si * du/dl * 50 * 0.20
+        """
         # calculate the solar energy based on ALG2 for a year
         total = 0
         final_total = []
@@ -335,7 +399,7 @@ class Calculator():
 
         return final_total, du
 
-    def cum_calculate_solar_energy_alg2(self, date, postcode, start_time, charging_duration, location):
+    def solar_energy_cal_preceeding_years(self, date, postcode, start_time, charging_duration, location):
         # calculate the solar energy based on ALG2 for preceeding years
         total = []
         date = Calculator.format_date(self, date)
@@ -347,7 +411,7 @@ class Calculator():
             temp.insert(0, str(year))
             temp.pop(1)
             ref_date2 = "-".join(temp)
-            energy = Calculator.calculate_solar_energy_alg2(self, ref_date2, postcode, start_time, charging_duration, location)
+            energy = Calculator.solar_energy_with_future(self, ref_date2, postcode, start_time, charging_duration, location)
             total.append(energy)
 
         return total
