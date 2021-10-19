@@ -80,10 +80,12 @@ class Calculator_Form(FlaskForm):
         """
         This function validate the Start Date field in the html form to prevent invalid input
         """
+        if field.data=="":
+            raise ValueError("Please Enter a Value")
         # only accepts date after February 2018 because of weather API
         date_time_obj = datetime.strptime('31/1/2018', '%d/%m/%Y').date()
         if field.data <= date_time_obj:
-            raise ValueError("Date must be after February 2018")
+            raise ValueError("Date must be after 1st February 2018")
 
     # validate charger configuration here
     def validate_ChargerConfiguration(self, field):

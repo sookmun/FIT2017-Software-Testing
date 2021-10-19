@@ -3,14 +3,16 @@ from app.calculator_form import Calculator_Form
 import main as app
 from wtforms.validators import ValidationError
 from datetime import datetime
-
+"""
+This file consist of unittest that test the validation functions in calculator_form.py
+"""
 
 class TestCalculatorForm(unittest.TestCase):
     """
     This test class test all the functions in calculator_form.py
     """
 
-    def test_validate_Batterypack(self):
+    def test_validate_BatteryPackCapacity(self):
         """
         Test the validation function for Battery_Pack_Capacity.
         It checks the boundary testing and also the condition coverage of each if and else statement.
@@ -59,9 +61,22 @@ class TestCalculatorForm(unittest.TestCase):
             with self.assertRaises(ValueError): #boundary testing
                 form.InitialCharge.data = "101"
                 form.validate_InitialCharge(form.InitialCharge)
+            with self.assertRaises(ValueError):
+                form.InitialCharge.data = ""  # ensures that there is data input
+                form.validate_InitialCharge(form.InitialCharge)
             #ensuring valid input is accepted
             try:
                 form.InitialCharge.data = "3"
+                form.validate_InitialCharge(form.InitialCharge)
+            except:
+                raise ValidationError("This input should be accepted")
+            try:
+                form.InitialCharge.data = "0"
+                form.validate_InitialCharge(form.InitialCharge)
+            except:
+                raise ValidationError("This input should be accepted")
+            try:
+                form.InitialCharge.data = "1"
                 form.validate_InitialCharge(form.InitialCharge)
             except:
                 raise ValidationError("This input should be accepted")
@@ -95,6 +110,9 @@ class TestCalculatorForm(unittest.TestCase):
             with self.assertRaises(ValueError):
                 form.FinalCharge.data = "101"   # boundary testing
                 form.validate_FinalCharge(form.FinalCharge)
+            with self.assertRaises(ValueError):
+                form.FinalCharge.data = ""  # ensures that there is data input
+                form.validate_FinalCharge(form.FinalCharge)
 
             # ensuring all valid input is accepted
             # uses the boundary value of valid inputs
@@ -103,7 +121,11 @@ class TestCalculatorForm(unittest.TestCase):
                 form.validate_FinalCharge(form.FinalCharge)
             except:
                 raise ValidationError("This input should be accepted")
-
+            try:
+                form.FinalCharge.data = "99"
+                form.validate_FinalCharge(form.FinalCharge)
+            except:
+                raise ValidationError("This input should be accepted")
             try:
                 form.InitialCharge.data = "0"
                 form.FinalCharge.data = "1"
@@ -126,6 +148,9 @@ class TestCalculatorForm(unittest.TestCase):
             form.StartDate.data = datetime.strptime("1/1/2018", '%d/%m/%Y').date()
             with self.assertRaises(ValueError):
                 form.validate_StartDate(form.StartDate)
+            with self.assertRaises(ValueError):
+                form.StartDate.data = ""  # ensures that there is data input
+                form.validate_StartDate(form.StartDate)
             # ensuring the valid input is accepted
             # uses the boundary date of 1 February 2018
             try:
@@ -139,7 +164,7 @@ class TestCalculatorForm(unittest.TestCase):
             except:
                 raise ValidationError("This input should be accepted")
 
-    def test_validate_ChargerCongfig(self):
+    def test_validate_ChargerConfiguration(self):
         """
         A test function for validation of charger configuration
         Only accepts number from 1-8
@@ -157,6 +182,9 @@ class TestCalculatorForm(unittest.TestCase):
             with self.assertRaises(ValueError):
                 form.ChargerConfiguration.data = "9"    # boundary value
                 form.validate_ChargerConfiguration(form.ChargerConfiguration)
+            with self.assertRaises(ValueError):
+                form.ChargerConfiguration.data = ""  # ensures that there is data input
+                form.validate_ChargerConfiguration(form.ChargerConfiguration)
             # ensuring the valid input is accepted
             # uses the valid boundary value of 1-8
             try:
@@ -164,7 +192,6 @@ class TestCalculatorForm(unittest.TestCase):
                 form.validate_ChargerConfiguration(form.ChargerConfiguration)
             except:
                 raise ValidationError("This input should be accepted")
-
             try:
                 form.ChargerConfiguration.data = "1"
                 form.validate_ChargerConfiguration(form.ChargerConfiguration)
@@ -186,7 +213,9 @@ class TestCalculatorForm(unittest.TestCase):
             with self.assertRaises(ValueError):
                 form.PostCode.data = "abc"          # ensuring is not a random string
                 form.validate_PostCode(form.PostCode)
-
+            with self.assertRaises(ValueError):
+                form.PostCode.data = ""  # ensures that there is data input
+                form.validate_PostCode(form.PostCode)
             # ensuring valid postcode is accepted
             try:
                 form.PostCode.data = "3800"
