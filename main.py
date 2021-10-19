@@ -1,10 +1,11 @@
-from flask import Flask, flash, render_template, request, jsonify
-from flask_wtf import FlaskForm
-
+from flask import Flask, flash, render_template, request
 from app.calculator_form import *
 from app.calculator import *
 import os
 
+"""
+This is the main file that runs the backend logic of the whole application
+"""
 SECRET_KEY = os.urandom(32)
 
 ev_calculator_app = Flask(__name__)
@@ -33,34 +34,21 @@ def operation_result():
         postcode = request.form['PostCode']
         location = request.form['Location']
 
-        # you may change the logic as your like
-        # duration = calculator.get_duration(start_time)
+        # find the charger configuration
+        power = calculator.get_charger_configuration(charger_configuration)
 
-        # is_peak = calculator.is_peak()
-
-        # if is_peak:
-        #     peak_period = calculator.peak_period(start_date)
-        power = calculator.charger_configuration(charger_configuration)
-
+        # find the charging duration
         charging_duration = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)
 
-        cost1 = calculator.cost_calculation(start_date, start_time, initial_charge, final_charge, battery_capacity, charger_configuration)
-        cost2 = calculator.cost_cal_without_hourly_weather(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
-        cost3 = calculator.cost_cal_with_hourly_weather(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
-        # cost = calculator.cost_calculation(initial_charge, final_charge, battery_capacity, is_peak, is_holiday)
+        # calculates the charging cost using different methods under different conditions
+        cost = calculator.cost_calculation(start_date, start_time, initial_charge, final_charge, battery_capacity, charger_configuration)
+        cost_without_hourly_weather = calculator.cost_cal_without_hourly_weather(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
+        cost_with_hourly_weather = calculator.cost_cal_with_hourly_weather(start_date, postcode, start_time, charging_duration, charger_configuration, initial_charge, final_charge, location)
 
-        # time = calculator.time_calculation(initial_charge, final_charge, battery_capacity, power)
-
-        # you may change the return statement also
-        
         # values of variables can be sent to the template for rendering the webpage that users will see
-        # return render_template('calculator.html', calculation_success=True, form=calculator_form)
-        return render_template('calculator.html', calculation_success=True, form=calculator_form, charging_time=charging_duration, cost1=cost1, cost2=cost2, cost3=cost3)
+        return render_template('calculator.html', calculation_success=True, form=calculator_form, charging_time=charging_duration, cost1=cost, cost2=cost_without_hourly_weather, cost3=cost_with_hourly_weather)
 
     else:
-        # battery_capacity = request.form['BatteryPackCapacity']
-        # flash(battery_capacity)
-        # flash("something went wrong")
         flash_errors(calculator_form)
         return render_template('calculator.html', calculation_success=False, form=calculator_form)
 

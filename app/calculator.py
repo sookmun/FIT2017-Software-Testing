@@ -2,6 +2,9 @@ import requests
 from datetime import datetime, timedelta
 import holidays
 
+"""
+This file consist of a Calculator class and its methods to calculate the charging cost.
+"""
 
 class Calculator():
     """
@@ -375,20 +378,23 @@ class Calculator():
 
     def solar_energy_with_future(self, date, postcode, start_time, charging_duration, location):
         """
-        This function calculates the solar energy only considering the date from 1st July 2008 up to the current date-2
-        only without considering hourly weather conditions.
-        Formula : si * du/dl * 50 * 0.20
+        This function calculates the solar energy with the date extending to the future. Moreover, the calculation needs
+         to take into account hourly weather conditions
+        Formula : si * du/dl * (1-cc/100) * 50 * 0.20
         """
         # calculate the solar energy based on ALG2 for a year
         total = 0
         final_total = []
+        # retrieve data from the weather api
         weather_data = Calculator.get_link_weather(self, postcode)
         data = Calculator.get_weather(self, weather_data, date, location)
+        # retrieve solar insolation, daylight length and duration
         si = Calculator.get_solar_insolation(self, data)
         dl = Calculator.get_day_light_length(self, data)
         Calculator.get_solar_energy_duration(self, data, start_time, charging_duration)
         du = Calculator.get_du(self)
-
+        
+        # for each partial hour, the solar energy was calculated
         for i in range(len(du)):
             temp = start_time.split(":")
             hr_num = int(temp[0]) + i
@@ -400,10 +406,13 @@ class Calculator():
         return final_total, du
 
     def solar_energy_cal_preceeding_years(self, date, postcode, start_time, charging_duration, location):
-        # calculate the solar energy based on ALG2 for preceeding years
+        """
+        This function calculates the solar energy for the preceeding years
+        """
         total = []
         date = Calculator.format_date(self, date)
-
+        
+        # calculate the solar energy for the preceeding years
         for i in range(3):
             ref_date = Calculator.check_date(self, date)
             temp = ref_date.split("-")
@@ -417,6 +426,9 @@ class Calculator():
         return total
 
     def get_link_weather(self, postcode):
+        """
+        This function retrieve data from the location API
+        """
         url = 'http://118.138.246.158/api/v1/location?postcode={postcode}'.format(postcode=postcode)
         temp = requests.get(url)
         data = temp.json()
@@ -478,6 +490,9 @@ class Calculator():
         return final_time
 
     def format_date(self, date):
+        """
+        format the date into an acceptable format for the API
+        """
         temp = date.split("/")
         temp.reverse()
         final_date = "-".join(temp)
